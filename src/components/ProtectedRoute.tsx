@@ -1,10 +1,10 @@
 
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import React, { Fragment } from 'react';
+import { Fragment, type ReactNode } from 'react';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
