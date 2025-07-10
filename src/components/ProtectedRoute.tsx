@@ -1,6 +1,7 @@
 
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import React, { Fragment } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -24,7 +25,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/auth" replace />;
   }
 
-  return <>{children}</>;
+  return <Fragment>{children}</Fragment>;
 };
 
 export default ProtectedRoute;
