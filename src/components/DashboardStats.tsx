@@ -46,13 +46,13 @@ const DashboardStats: FC = () => {
 
   return (
     <Fragment>
-      <div>
+      <div className="px-4 sm:px-0">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Dashboard</h2>
         <p className="text-gray-600">Ringkasan keseluruhan budidaya ikan lele Anda</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-4">
         <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ const DashboardStats: FC = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-6">
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
