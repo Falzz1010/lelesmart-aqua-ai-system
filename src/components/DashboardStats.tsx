@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -8,21 +7,34 @@ import {
   TrendingUp, 
   AlertCircle,
   Calendar,
-  Activity
+  Activity,
+  Thermometer,
+  Eye
 } from "lucide-react";
 import { usePonds } from "@/hooks/usePonds";
-import { useRealtimeFeedingSchedules, useRealtimeHealthRecords } from "@/hooks/useRealtimeData";
+import { useRealtimeFeedingSchedules, useRealtimeHealthRecords, useRealtimeWaterQuality } from "@/hooks/useRealtimeData";
 
 const DashboardStats = () => {
   const { ponds, loading: pondsLoading } = usePonds();
   const { schedules, loading: schedulesLoading } = useRealtimeFeedingSchedules();
   const { healthRecords, loading: healthLoading } = useRealtimeHealthRecords();
+  const { waterQualityLogs, loading: waterLoading } = useRealtimeWaterQuality();
 
   // Calculate statistics
   const totalPonds = ponds.length;
   const activePonds = ponds.filter(pond => pond.status === 'active').length;
   const totalFish = ponds.reduce((sum, pond) => sum + (pond.fish_count || 0), 0);
-  const pendingFeeds = schedules.filter(schedule => schedule.status === 'pending').length;
+  
+  // Today's feeding schedules
+  const today = new Date().toISOString().split('T')[0];
+  const todaySchedules = schedules.filter(schedule => {
+    const scheduleDate = new Date(schedule.created_at).toISOString().split('T')[0];
+    return scheduleDate === today;
+  });
+  const pendingFeeds = todaySchedules.filter(schedule => schedule.status === 'pending').length;
+  const completedFeeds = todaySchedules.filter(schedule => schedule.status === 'completed').length;
+
+  // Health statistics
   const healthyPonds = ponds.filter(pond => {
     const recentHealthRecord = healthRecords
       .filter(record => record.pond_id === pond.id)
@@ -32,7 +44,16 @@ const DashboardStats = () => {
 
   const healthPercentage = totalPonds > 0 ? (healthyPonds / totalPonds) * 100 : 100;
 
-  if (pondsLoading || schedulesLoading || healthLoading) {
+  // Water quality average
+  const recentWaterQuality = waterQualityLogs.slice(0, 10);
+  const avgTemperature = recentWaterQuality.length > 0 
+    ? recentWaterQuality.reduce((sum, log) => sum + (log.temperature || 0), 0) / recentWaterQuality.length 
+    : 0;
+  const avgPH = recentWaterQuality.length > 0 
+    ? recentWaterQuality.reduce((sum, log) => sum + (log.ph_level || 0), 0) / recentWaterQuality.length 
+    : 0;
+
+  if (pondsLoading || schedulesLoading || healthLoading || waterLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -81,7 +102,7 @@ const DashboardStats = () => {
               <div>
                 <p className="text-orange-100 text-sm font-medium">Jadwal Pakan</p>
                 <p className="text-2xl sm:text-3xl font-bold">{pendingFeeds}</p>
-                <p className="text-orange-100 text-sm">menunggu</p>
+                <p className="text-orange-100 text-sm">{completedFeeds} selesai</p>
               </div>
               <Calendar className="h-10 w-10 sm:h-12 sm:w-12 text-orange-200" />
             </div>
@@ -113,11 +134,11 @@ const DashboardStats = () => {
             <CardDescription>Pemberian pakan yang harus dilakukan</CardDescription>
           </CardHeader>
           <CardContent>
-            {schedules.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">Belum ada jadwal pakan</p>
+            {todaySchedules.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">Belum ada jadwal pakan hari ini</p>
             ) : (
               <div className="space-y-3">
-                {schedules.slice(0, 3).map((schedule) => (
+                {todaySchedules.slice(0, 3).map((schedule) => (
                   <div key={schedule.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{schedule.ponds?.name || 'Kolam'}</p>
@@ -131,6 +152,11 @@ const DashboardStats = () => {
                     </div>
                   </div>
                 ))}
+                {todaySchedules.length > 3 && (
+                  <p className="text-sm text-gray-500 text-center">
+                    +{todaySchedules.length - 3} jadwal lainnya
+                  </p>
+                )}
               </div>
             )}
           </CardContent>
@@ -153,7 +179,7 @@ const DashboardStats = () => {
                 </div>
                 <Progress value={healthPercentage} className="h-2" />
               </div>
-              {healthRecords.length > 0 && (
+              {healthRecords.length > 0 ? (
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium">Catatan Terbaru:</h4>
                   {healthRecords.slice(0, 2).map((record) => (
@@ -174,11 +200,85 @@ const DashboardStats = () => {
                     </div>
                   ))}
                 </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-2">
+                  Belum ada catatan kesehatan
+                </p>
               )}
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Water Quality Overview */}
+      {recentWaterQuality.length > 0 && (
+        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Droplets className="h-5 w-5 text-blue-600" />
+              <span>Kualitas Air Terkini</span>
+            </CardTitle>
+            <CardDescription>Rata-rata parameter kualitas air dari semua kolam</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-blue-50/50 rounded-lg">
+                <Thermometer className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-blue-600">{avgTemperature.toFixed(1)}°C</p>
+                <p className="text-sm text-gray-600">Suhu Rata-rata</p>
+              </div>
+              <div className="text-center p-4 bg-green-50/50 rounded-lg">
+                <Eye className="h-6 w-6 text-green-600 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-green-600">{avgPH.toFixed(1)}</p>
+                <p className="text-sm text-gray-600">pH Rata-rata</p>
+              </div>
+              <div className="text-center p-4 bg-purple-50/50 rounded-lg">
+                <Activity className="h-6 w-6 text-purple-600 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-purple-600">{recentWaterQuality.length}</p>
+                <p className="text-sm text-gray-600">Log Terbaru</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Quick Actions */}
+      <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+        <CardHeader>
+          <CardTitle>Aksi Cepat</CardTitle>
+          <CardDescription>Tindakan yang mungkin perlu dilakukan</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pendingFeeds > 0 && (
+              <div className="p-3 bg-orange-50/50 rounded-lg border-l-4 border-orange-400">
+                <h4 className="font-medium text-orange-800 mb-1">🍽️ Jadwal Pakan Tertunda</h4>
+                <p className="text-sm text-orange-700">
+                  {pendingFeeds} jadwal pakan belum diselesaikan hari ini
+                </p>
+              </div>
+            )}
+            
+            {healthyPonds < totalPonds && (
+              <div className="p-3 bg-red-50/50 rounded-lg border-l-4 border-red-400">
+                <h4 className="font-medium text-red-800 mb-1">🏥 Perhatian Kesehatan</h4>
+                <p className="text-sm text-red-700">
+                  {totalPonds - healthyPonds} kolam memerlukan perhatian kesehatan
+                </p>
+              </div>
+            )}
+
+            {totalPonds === 0 && (
+              <div className="p-3 bg-blue-50/50 rounded-lg border-l-4 border-blue-400">
+                <h4 className="font-medium text-blue-800 mb-1">🏊 Mulai Budidaya</h4>
+                <p className="text-sm text-blue-700">
+                  Tambahkan kolam pertama Anda untuk memulai monitoring
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

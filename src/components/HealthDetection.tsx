@@ -1,10 +1,12 @@
-
 import { useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Camera, 
   Upload, 
@@ -14,16 +16,30 @@ import {
   Eye,
   Heart,
   Activity,
-  FileImage
+  FileImage,
+  Plus
 } from "lucide-react";
+import { usePonds } from "@/hooks/usePonds";
+import { useRealtimeHealthRecords } from "@/hooks/useRealtimeData";
+import { useToast } from "@/hooks/use-toast";
 
 const HealthDetection = () => {
+  const { ponds } = usePonds();
+  const { healthRecords, loading, createHealthRecord } = useRealtimeHealthRecords();
+  const { toast } = useToast();
   const [dragActive, setDragActive] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newRecord, setNewRecord] = useState({
+    pond_id: "",
+    health_status: "healthy" as "healthy" | "sick" | "critical",
+    symptoms: "",
+    treatment: ""
+  });
 
-  // Mock analysis results
+  // Mock analysis results for demonstration
   const mockAnalysis = {
     healthScore: 85,
     status: "healthy",
@@ -45,33 +61,6 @@ const HealthDetection = () => {
       { label: "Nafsu Makan", value: "Kurang", status: "warning" }
     ]
   };
-
-  const recentAnalyses = [
-    {
-      id: 1,
-      date: "2024-01-15 14:30",
-      pond: "Kolam A",
-      result: "Sehat",
-      score: 92,
-      image: "/api/placeholder/100/100"
-    },
-    {
-      id: 2,
-      date: "2024-01-15 10:15", 
-      pond: "Kolam B",
-      result: "Perlu Perhatian",
-      score: 75,
-      image: "/api/placeholder/100/100"
-    },
-    {
-      id: 3,
-      date: "2024-01-14 16:45",
-      pond: "Kolam C", 
-      result: "Sehat",
-      score: 88,
-      image: "/api/placeholder/100/100"
-    }
-  ];
 
   const handleDrag = useCallback((e) => {
     e.preventDefault();
@@ -119,23 +108,149 @@ const HealthDetection = () => {
     }, 3000);
   };
 
+  const handleCreateRecord = async () => {
+    if (!newRecord.pond_id || !newRecord.health_status) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Mohon lengkapi kolam dan status kesehatan"
+      });
+      return;
+    }
+
+    try {
+      await createHealthRecord(newRecord);
+      setIsDialogOpen(false);
+      setNewRecord({
+        pond_id: "",
+        health_status: "healthy",
+        symptoms: "",
+        treatment: ""
+      });
+      toast({
+        title: "Berhasil",
+        description: "Catatan kesehatan berhasil ditambahkan"
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Gagal menambahkan catatan kesehatan"
+      });
+    }
+  };
+
   const getHealthColor = (score) => {
     if (score >= 80) return "text-green-600";
     if (score >= 60) return "text-yellow-600";
     return "text-red-600";
   };
 
-  const getHealthBadge = (score) => {
-    if (score >= 80) return "bg-green-500";
-    if (score >= 60) return "bg-yellow-500";
-    return "bg-red-500";
+  const getHealthBadge = (status) => {
+    switch (status) {
+      case "healthy": return "bg-green-500";
+      case "sick": return "bg-yellow-500";
+      case "critical": return "bg-red-500";
+      default: return "bg-gray-500";
+    }
   };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "healthy": return "Sehat";
+      case "sick": return "Sakit";
+      case "critical": return "Kritis";
+      default: return status;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold text-gray-900">Deteksi Kesehatan Ikan AI</h2>
-        <p className="text-gray-600 mt-1">Upload foto atau video ikan untuk analisis kesehatan otomatis</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">Deteksi Kesehatan Ikan AI</h2>
+          <p className="text-gray-600 mt-1">Upload foto atau video ikan untuk analisis kesehatan otomatis</p>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Catatan
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Tambah Catatan Kesehatan</DialogTitle>
+              <DialogDescription>
+                Buat catatan kesehatan ikan secara manual
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="pond">Kolam</Label>
+                <Select value={newRecord.pond_id} onValueChange={(value) => setNewRecord({...newRecord, pond_id: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih kolam" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ponds.map((pond) => (
+                      <SelectItem key={pond.id} value={pond.id}>
+                        {pond.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="status">Status Kesehatan</Label>
+                <Select value={newRecord.health_status} onValueChange={(value: any) => setNewRecord({...newRecord, health_status: value})}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="healthy">Sehat</SelectItem>
+                    <SelectItem value="sick">Sakit</SelectItem>
+                    <SelectItem value="critical">Kritis</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="symptoms">Gejala (Opsional)</Label>
+                <Textarea
+                  id="symptoms"
+                  value={newRecord.symptoms}
+                  onChange={(e) => setNewRecord({...newRecord, symptoms: e.target.value})}
+                  placeholder="Deskripsikan gejala yang diamati..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="treatment">Pengobatan (Opsional)</Label>
+                <Textarea
+                  id="treatment"
+                  value={newRecord.treatment}
+                  onChange={(e) => setNewRecord({...newRecord, treatment: e.target.value})}
+                  placeholder="Deskripsikan pengobatan yang diberikan..."
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Batal
+                </Button>
+                <Button onClick={handleCreateRecord}>
+                  Simpan
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -231,7 +346,7 @@ const HealthDetection = () => {
                   <Activity className="h-5 w-5 text-green-600" />
                   <span>Hasil Analisis</span>
                 </div>
-                <Badge className={`${getHealthBadge(analysisResult.healthScore)} text-white`}>
+                <Badge className={`${getHealthBadge(analysisResult.status)} text-white`}>
                   Skor: {analysisResult.healthScore}%
                 </Badge>
               </CardTitle>
@@ -289,39 +404,52 @@ const HealthDetection = () => {
           </Card>
         )}
 
-        {/* Recent Analyses */}
+        {/* Recent Health Records */}
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50 lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Clock className="h-5 w-5 text-blue-600" />
-              <span>Riwayat Analisis Terbaru</span>
+              <span>Riwayat Kesehatan Terbaru</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {recentAnalyses.map((analysis) => (
-                <div key={analysis.id} className="p-4 bg-white/50 rounded-lg border border-blue-100/30">
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge variant="outline">{analysis.pond}</Badge>
-                    <span className="text-xs text-gray-500">{analysis.date}</span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3 mb-3">
-                    <FileImage className="h-12 w-12 text-gray-400 bg-gray-100/50 p-2 rounded" />
-                    <div>
-                      <p className="font-medium text-gray-800">{analysis.result}</p>
-                      <p className={`text-sm ${getHealthColor(analysis.score)}`}>
-                        Skor: {analysis.score}%
-                      </p>
+            {healthRecords.length === 0 ? (
+              <div className="text-center py-8">
+                <Heart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">Belum ada catatan kesehatan</p>
+                <p className="text-sm text-gray-400">Tambah catatan kesehatan untuk memulai monitoring</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {healthRecords.slice(0, 6).map((record) => (
+                  <div key={record.id} className="p-4 bg-white/50 rounded-lg border border-blue-100/30">
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge variant="outline">{record.ponds?.name || 'Unknown'}</Badge>
+                      <span className="text-xs text-gray-500">
+                        {new Date(record.created_at).toLocaleDateString()}
+                      </span>
                     </div>
-                  </div>
+                    
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className={`w-3 h-3 rounded-full ${getHealthBadge(record.health_status)}`}></div>
+                      <div>
+                        <p className="font-medium text-gray-800">{getStatusText(record.health_status)}</p>
+                        {record.symptoms && (
+                          <p className="text-sm text-gray-600 truncate">{record.symptoms}</p>
+                        )}
+                      </div>
+                    </div>
 
-                  <Button size="sm" variant="outline" className="w-full">
-                    Lihat Detail
-                  </Button>
-                </div>
-              ))}
-            </div>
+                    {record.treatment && (
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-500">Pengobatan:</p>
+                        <p className="text-sm text-gray-700 truncate">{record.treatment}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
