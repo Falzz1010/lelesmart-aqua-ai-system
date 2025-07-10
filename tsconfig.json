@@ -7,7 +7,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "react/jsx-runtime": ["./node_modules/react/jsx-runtime"]
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,
