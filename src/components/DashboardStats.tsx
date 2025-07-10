@@ -10,10 +10,11 @@ import {
   Calendar,
   Activity
 } from "lucide-react";
-import { useRealtimePonds, useRealtimeFeedingSchedules, useRealtimeHealthRecords } from "@/hooks/useRealtimeData";
+import { usePonds } from "@/hooks/usePonds";
+import { useRealtimeFeedingSchedules, useRealtimeHealthRecords } from "@/hooks/useRealtimeData";
 
 const DashboardStats = () => {
-  const { ponds, loading: pondsLoading } = useRealtimePonds();
+  const { ponds, loading: pondsLoading } = usePonds();
   const { schedules, loading: schedulesLoading } = useRealtimeFeedingSchedules();
   const { healthRecords, loading: healthLoading } = useRealtimeHealthRecords();
 
@@ -40,69 +41,69 @@ const DashboardStats = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Dashboard</h2>
         <p className="text-gray-600">Ringkasan keseluruhan budidaya ikan lele Anda</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-100 text-sm font-medium">Total Kolam</p>
-                <p className="text-3xl font-bold">{totalPonds}</p>
+                <p className="text-2xl sm:text-3xl font-bold">{totalPonds}</p>
                 <p className="text-blue-100 text-sm">{activePonds} aktif</p>
               </div>
-              <Fish className="h-12 w-12 text-blue-200" />
+              <Fish className="h-10 w-10 sm:h-12 sm:w-12 text-blue-200" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-green-100 text-sm font-medium">Total Ikan</p>
-                <p className="text-3xl font-bold">{totalFish.toLocaleString()}</p>
+                <p className="text-2xl sm:text-3xl font-bold">{totalFish.toLocaleString()}</p>
                 <p className="text-green-100 text-sm">ekor</p>
               </div>
-              <Activity className="h-12 w-12 text-green-200" />
+              <Activity className="h-10 w-10 sm:h-12 sm:w-12 text-green-200" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-orange-100 text-sm font-medium">Jadwal Pakan</p>
-                <p className="text-3xl font-bold">{pendingFeeds}</p>
+                <p className="text-2xl sm:text-3xl font-bold">{pendingFeeds}</p>
                 <p className="text-orange-100 text-sm">menunggu</p>
               </div>
-              <Calendar className="h-12 w-12 text-orange-200" />
+              <Calendar className="h-10 w-10 sm:h-12 sm:w-12 text-orange-200" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-purple-100 text-sm font-medium">Kesehatan</p>
-                <p className="text-3xl font-bold">{healthPercentage.toFixed(0)}%</p>
+                <p className="text-2xl sm:text-3xl font-bold">{healthPercentage.toFixed(0)}%</p>
                 <p className="text-purple-100 text-sm">sehat</p>
               </div>
-              <Droplets className="h-12 w-12 text-purple-200" />
+              <Droplets className="h-10 w-10 sm:h-12 sm:w-12 text-purple-200" />
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -118,11 +119,11 @@ const DashboardStats = () => {
               <div className="space-y-3">
                 {schedules.slice(0, 3).map((schedule) => (
                   <div key={schedule.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">{schedule.ponds?.name || 'Kolam'}</p>
-                      <p className="text-sm text-gray-600">{schedule.feed_amount_kg}kg - {schedule.feed_type}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{schedule.ponds?.name || 'Kolam'}</p>
+                      <p className="text-sm text-gray-600 truncate">{schedule.feed_amount_kg}kg - {schedule.feed_type}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex-shrink-0 ml-2">
                       <p className="text-sm font-medium">{schedule.feeding_time}</p>
                       <Badge variant={schedule.status === 'completed' ? 'default' : 'secondary'}>
                         {schedule.status === 'completed' ? 'Selesai' : 'Menunggu'}
@@ -157,18 +158,18 @@ const DashboardStats = () => {
                   <h4 className="text-sm font-medium">Catatan Terbaru:</h4>
                   {healthRecords.slice(0, 2).map((record) => (
                     <div key={record.id} className="text-sm p-2 bg-gray-50 rounded">
-                      <div className="flex justify-between">
-                        <span>{record.ponds?.name || 'Kolam'}</span>
+                      <div className="flex justify-between items-start">
+                        <span className="font-medium truncate flex-1">{record.ponds?.name || 'Kolam'}</span>
                         <Badge 
                           variant={record.health_status === 'healthy' ? 'default' : 'destructive'}
-                          className="text-xs"
+                          className="text-xs ml-2 flex-shrink-0"
                         >
                           {record.health_status === 'healthy' ? 'Sehat' : 
                            record.health_status === 'sick' ? 'Sakit' : 'Kritis'}
                         </Badge>
                       </div>
                       {record.symptoms && (
-                        <p className="text-gray-600 mt-1">{record.symptoms}</p>
+                        <p className="text-gray-600 mt-1 truncate">{record.symptoms}</p>
                       )}
                     </div>
                   ))}

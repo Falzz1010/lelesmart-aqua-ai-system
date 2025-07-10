@@ -3,81 +3,56 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export const useRealtimePonds = () => {
-  const [ponds, setPonds] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+export interface FeedingSchedule {
+  id: string;
+  pond_id: string;
+  feeding_time: string;
+  feed_amount_kg: number;
+  feed_type: string;
+  status: 'pending' | 'completed';
+  created_at: string;
+  ponds?: { name: string };
+}
 
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchPonds = async () => {
-      const { data, error } = await (supabase as any)
-        .from('ponds')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (!error && data) {
-        setPonds(data);
-      }
-      setLoading(false);
-    };
-
-    fetchPonds();
-
-    // Subscribe to realtime changes
-    const channel = supabase
-      .channel('ponds-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'ponds'
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setPonds(prev => [payload.new, ...prev]);
-          } else if (payload.eventType === 'UPDATE') {
-            setPonds(prev => prev.map(pond => 
-              pond.id === payload.new.id ? payload.new : pond
-            ));
-          } else if (payload.eventType === 'DELETE') {
-            setPonds(prev => prev.filter(pond => pond.id !== payload.old.id));
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
-
-  return { ponds, loading };
-};
+export interface HealthRecord {
+  id: string;
+  pond_id: string;
+  health_status: 'healthy' | 'sick' | 'critical';
+  symptoms?: string;
+  treatment?: string;
+  created_at: string;
+  ponds?: { name: string };
+}
 
 export const useRealtimeFeedingSchedules = () => {
-  const [schedules, setSchedules] = useState<any[]>([]);
+  const [schedules, setSchedules] = useState<FeedingSchedule[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     const fetchSchedules = async () => {
-      const { data, error } = await (supabase as any)
-        .from('feeding_schedules')
-        .select(`
-          *,
-          ponds (name)
-        `)
-        .order('feeding_time', { ascending: true });
-      
-      if (!error && data) {
-        setSchedules(data);
+      try {
+        const { data, error } = await supabase
+          .from('feeding_schedules')
+          .select(`
+            *,
+            ponds (name)
+          `)
+          .order('feeding_time', { ascending: true });
+        
+        if (!error && data) {
+          setSchedules(data);
+        }
+      } catch (error) {
+        console.error('Error fetching feeding schedules:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchSchedules();
@@ -92,7 +67,7 @@ export const useRealtimeFeedingSchedules = () => {
           table: 'feeding_schedules'
         },
         () => {
-          fetchSchedules(); // Refetch to get pond names
+          fetchSchedules();
         }
       )
       .subscribe();
@@ -106,26 +81,34 @@ export const useRealtimeFeedingSchedules = () => {
 };
 
 export const useRealtimeHealthRecords = () => {
-  const [healthRecords, setHealthRecords] = useState<any[]>([]);
+  const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     const fetchHealthRecords = async () => {
-      const { data, error } = await (supabase as any)
-        .from('health_records')
-        .select(`
-          *,
-          ponds (name)
-        `)
-        .order('created_at', { ascending: false });
-      
-      if (!error && data) {
-        setHealthRecords(data);
+      try {
+        const { data, error } = await supabase
+          .from('health_records')
+          .select(`
+            *,
+            ponds (name)
+          `)
+          .order('created_at', { ascending: false });
+        
+        if (!error && data) {
+          setHealthRecords(data);
+        }
+      } catch (error) {
+        console.error('Error fetching health records:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchHealthRecords();
@@ -140,7 +123,7 @@ export const useRealtimeHealthRecords = () => {
           table: 'health_records'
         },
         () => {
-          fetchHealthRecords();
+          fetchHealthRecorms();
         }
       )
       .subscribe();
