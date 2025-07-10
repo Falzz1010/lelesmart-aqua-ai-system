@@ -3,7 +3,6 @@
 /** @jsx React.createElement */
 import React, { useState, Fragment } from 'react';
 import type { FC } from 'react';
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
