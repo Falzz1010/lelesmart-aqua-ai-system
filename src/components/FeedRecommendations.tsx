@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,9 +19,9 @@ const FeedRecommendations = () => {
 
   const ponds = [
     { id: "all", name: "Semua Kolam" },
-    { id: 1, name: "Kolam A" },
-    { id: 2, name: "Kolam B" }, 
-    { id: 3, name: "Kolam C" }
+    { id: "1", name: "Kolam A" },
+    { id: "2", name: "Kolam B" }, 
+    { id: "3", name: "Kolam C" }
   ];
 
   const feedingSchedule = [
