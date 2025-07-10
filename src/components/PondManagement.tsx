@@ -1,5 +1,7 @@
 
-import React, { Fragment } from 'react';
+/** @jsxRuntime classic */
+/** @jsx React.createElement */
+import React, { useState, Fragment } from 'react';
 import type { FC } from 'react';
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
