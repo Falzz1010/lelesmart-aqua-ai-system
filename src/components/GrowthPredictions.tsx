@@ -97,14 +97,14 @@ const GrowthPredictions = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 sm:px-0">
       <div>
         <h2 className="text-3xl font-bold text-gray-900">Prediksi Panen & Pertumbuhan</h2>
         <p className="text-gray-600 mt-1">Analisis AI untuk estimasi hasil panen dan strategi optimal</p>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         {growthMetrics.map((metric, index) => (
           <Card key={index} className="bg-white/70 backdrop-blur-sm border-blue-100/50">
             <CardContent className="p-4">
@@ -129,7 +129,7 @@ const GrowthPredictions = () => {
       </div>
 
       {/* Harvest Predictions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {harvestPredictions.map((prediction, index) => (
           <Card key={index} className="bg-white/70 backdrop-blur-sm border-blue-100/50">
             <CardHeader className="pb-3">
@@ -195,7 +195,7 @@ const GrowthPredictions = () => {
       </div>
 
       {/* Market Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">

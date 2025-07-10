@@ -146,8 +146,8 @@ const UserManagement = () => {
   const roleStats = getRoleStats();
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-6 px-4 sm:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Manajemen Pengguna</h2>
           <p className="text-gray-600 mt-1">Kelola akses dan peran pengguna sistem</p>
@@ -237,7 +237,7 @@ const UserManagement = () => {
       </div>
 
       {/* Role Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         {Object.entries(roleConfig).map(([role, config]) => {
           const Icon = config.icon;
           return (
@@ -360,7 +360,7 @@ const UserManagement = () => {
           <CardDescription>Ringkasan akses yang dimiliki setiap peran pengguna</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             {Object.entries(roleConfig).map(([role, config]) => {
               const Icon = config.icon;
               return (

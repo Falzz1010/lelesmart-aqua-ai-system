@@ -135,13 +135,13 @@ const HealthDetection = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 sm:px-0">
       <div>
         <h2 className="text-3xl font-bold text-gray-900">Deteksi Kesehatan Ikan AI</h2>
         <p className="text-gray-600 mt-1">Upload foto atau video ikan untuk analisis kesehatan otomatis</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* Upload Section */}
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardHeader>

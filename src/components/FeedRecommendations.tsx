@@ -95,8 +95,8 @@ const FeedRecommendations = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-6 px-4 sm:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Rekomendasi Pakan AI</h2>
           <p className="text-gray-600 mt-1">Jadwal pemberian pakan optimal berdasarkan AI</p>
@@ -118,7 +118,7 @@ const FeedRecommendations = () => {
       </div>
 
       {/* Today's Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
         <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -173,7 +173,7 @@ const FeedRecommendations = () => {
       </div>
 
       {/* Feeding Schedule */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
