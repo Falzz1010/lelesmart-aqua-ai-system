@@ -144,7 +144,7 @@ const UserManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Manajemen Pengguna</h2>
           <p className="text-gray-600 mt-1">Kelola akses dan peran pengguna sistem</p>
@@ -296,7 +296,7 @@ const UserManagement = () => {
                           </Badge>
                         </div>
                         
-                        <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 text-sm text-gray-600">
                           <div className="flex items-center space-x-1">
                             <Mail className="h-3 w-3" />
                             <span>{user.email}</span>

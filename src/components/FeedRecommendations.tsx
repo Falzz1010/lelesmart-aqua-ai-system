@@ -93,12 +93,13 @@ const FeedRecommendations = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Rekomendasi Pakan AI</h2>
           <p className="text-gray-600 mt-1">Jadwal pemberian pakan optimal berdasarkan AI</p>
         </div>
-        <div className="flex space-x-2">
+        {/* Make buttons wrap on narrow viewports */}
+        <div className="flex flex-wrap gap-2">
           {ponds.map((pond) => (
             <Button
               key={pond.id} 
