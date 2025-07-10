@@ -1,5 +1,6 @@
 /** @jsxRuntime classic */
 /** @jsx React.createElement */
+/** @jsxFrag Fragment */
 import React, { useState, Fragment } from 'react';
 import type { FC } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
