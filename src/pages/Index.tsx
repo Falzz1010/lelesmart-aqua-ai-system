@@ -3,19 +3,16 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { 
   Fish, 
-  Droplets, 
-  Thermometer, 
-  TrendingUp, 
-  AlertTriangle, 
-  Calendar,
-  Camera,
   BarChart3,
   Users,
-  Settings
+  Calendar,
+  Camera,
+  TrendingUp,
+  LogOut
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import DashboardStats from "@/components/DashboardStats";
 import PondManagement from "@/components/PondManagement";
 import FeedRecommendations from "@/components/FeedRecommendations";
@@ -25,7 +22,7 @@ import UserManagement from "@/components/UserManagement";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [user] = useState({ role: "farmer", name: "Pak Budi" }); // Mock user
+  const { user, signOut } = useAuth();
 
   const navigationItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
@@ -74,12 +71,20 @@ const Index = () => {
             </div>
             <div className="flex items-center space-x-4">
               <Badge variant="outline" className="text-blue-600 border-blue-200">
-                {user.role === "farmer" ? "Peternak" : user.role}
+                Peternak
               </Badge>
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                <p className="text-sm font-medium text-gray-900">{user?.email}</p>
                 <p className="text-xs text-gray-500">Selamat datang kembali</p>
               </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={signOut}
+                className="text-gray-600 hover:text-red-600"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -124,19 +129,19 @@ const Index = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-700">AI Online</span>
+                    <span className="text-sm text-gray-700">Database Online</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-700">Sensor Aktif</span>
+                    <span className="text-sm text-gray-700">Realtime Aktif</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm text-gray-700">Update Cuaca</span>
+                    <span className="text-sm text-gray-700">AI Standby</span>
                   </div>
                 </div>
               </CardContent>
