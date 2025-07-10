@@ -1,4 +1,5 @@
-import * as React from "react"
+import React from "react";
+import type { FC, ReactNode, HTMLAttributes } from "react";
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
@@ -24,18 +25,18 @@ const badgeVariants = cva(
 )
 
 // Explicitly type variant and className for BadgeProps
-export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface BadgeProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'secondary' | 'destructive' | 'outline';
   className?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
-function Badge({ className, variant = 'default', children, ...props }: BadgeProps) {
+const Badge: FC<BadgeProps> = ({ className, variant = 'default', children, ...props }) => {
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props}>
       {children}
     </div>
   );
-}
+};
 
 export { Badge, badgeVariants }
