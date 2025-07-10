@@ -38,7 +38,7 @@ export const useRealtimeFeedingSchedules = () => {
     const fetchSchedules = async () => {
       try {
         const { data, error } = await supabase
-          .from('feeding_schedules')
+          .from('feeding_schedules' as any)
           .select(`
             *,
             ponds (name)
@@ -94,7 +94,7 @@ export const useRealtimeHealthRecords = () => {
     const fetchHealthRecords = async () => {
       try {
         const { data, error } = await supabase
-          .from('health_records')
+          .from('health_records' as any)
           .select(`
             *,
             ponds (name)
@@ -123,7 +123,7 @@ export const useRealtimeHealthRecords = () => {
           table: 'health_records'
         },
         () => {
-          fetchHealthRecorms();
+          fetchHealthRecords();
         }
       )
       .subscribe();

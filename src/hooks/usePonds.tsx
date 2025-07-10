@@ -38,7 +38,7 @@ export const usePonds = () => {
   const fetchPonds = async () => {
     try {
       const { data, error } = await supabase
-        .from('ponds')
+        .from('ponds' as any)
         .select('*')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
@@ -91,7 +91,7 @@ export const usePonds = () => {
   const createPond = async (pondData: Omit<Pond, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => {
     try {
       const { data, error } = await supabase
-        .from('ponds')
+        .from('ponds' as any)
         .insert([{
           ...pondData,
           user_id: user?.id
@@ -121,7 +121,7 @@ export const usePonds = () => {
   const updatePond = async (id: string, updates: Partial<Pond>) => {
     try {
       const { data, error } = await supabase
-        .from('ponds')
+        .from('ponds' as any)
         .update(updates)
         .eq('id', id)
         .eq('user_id', user?.id)
@@ -150,7 +150,7 @@ export const usePonds = () => {
   const deletePond = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('ponds')
+        .from('ponds' as any)
         .delete()
         .eq('id', id)
         .eq('user_id', user?.id);

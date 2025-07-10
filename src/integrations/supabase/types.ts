@@ -49,6 +49,44 @@ export type Database = {
           },
         ]
       }
+      feeding_schedules: {
+        Row: {
+          created_at: string
+          feed_amount_kg: number
+          feed_type: string
+          feeding_time: string
+          id: string
+          pond_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          feed_amount_kg: number
+          feed_type: string
+          feeding_time: string
+          id?: string
+          pond_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          feed_amount_kg?: number
+          feed_type?: string
+          feeding_time?: string
+          id?: string
+          pond_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feeding_schedules_pond_id_fkey"
+            columns: ["pond_id"]
+            isOneToOne: false
+            referencedRelation: "ponds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guidance_schedule: {
         Row: {
           created_at: string | null
@@ -107,6 +145,41 @@ export type Database = {
           },
         ]
       }
+      health_records: {
+        Row: {
+          created_at: string
+          health_status: string
+          id: string
+          pond_id: string
+          symptoms: string | null
+          treatment: string | null
+        }
+        Insert: {
+          created_at?: string
+          health_status: string
+          id?: string
+          pond_id: string
+          symptoms?: string | null
+          treatment?: string | null
+        }
+        Update: {
+          created_at?: string
+          health_status?: string
+          id?: string
+          pond_id?: string
+          symptoms?: string | null
+          treatment?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_records_pond_id_fkey"
+            columns: ["pond_id"]
+            isOneToOne: false
+            referencedRelation: "ponds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -145,6 +218,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ponds: {
+        Row: {
+          created_at: string
+          depth_m: number
+          fish_age_days: number
+          fish_count: number
+          id: string
+          name: string
+          ph_level: number | null
+          size_m2: number
+          status: string
+          updated_at: string
+          user_id: string
+          water_temperature: number | null
+        }
+        Insert: {
+          created_at?: string
+          depth_m: number
+          fish_age_days?: number
+          fish_count?: number
+          id?: string
+          name: string
+          ph_level?: number | null
+          size_m2: number
+          status?: string
+          updated_at?: string
+          user_id: string
+          water_temperature?: number | null
+        }
+        Update: {
+          created_at?: string
+          depth_m?: number
+          fish_age_days?: number
+          fish_count?: number
+          id?: string
+          name?: string
+          ph_level?: number | null
+          size_m2?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+          water_temperature?: number | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
