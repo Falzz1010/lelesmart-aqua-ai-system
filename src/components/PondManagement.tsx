@@ -53,17 +53,18 @@ const PondManagement = () => {
     e.preventDefault();
     
     const pondData = {
-      ...formData,
+      name: formData.name,
       size_m2: parseFloat(formData.size_m2),
       depth_m: parseFloat(formData.depth_m),
       fish_count: parseInt(formData.fish_count) || 0,
       fish_age_days: parseInt(formData.fish_age_days) || 0,
+      status: formData.status,
       user_id: user?.id
     };
 
     try {
       if (editingPond) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('ponds')
           .update(pondData)
           .eq('id', editingPond.id);
@@ -71,7 +72,7 @@ const PondManagement = () => {
         if (error) throw error;
         toast({ title: "Berhasil", description: "Kolam berhasil diupdate" });
       } else {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('ponds')
           .insert([pondData]);
         
@@ -105,7 +106,7 @@ const PondManagement = () => {
 
   const handleDelete = async (pondId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('ponds')
         .delete()
         .eq('id', pondId);

@@ -12,7 +12,7 @@ export const useRealtimePonds = () => {
     if (!user) return;
 
     const fetchPonds = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('ponds')
         .select('*')
         .order('created_at', { ascending: false });
@@ -66,7 +66,7 @@ export const useRealtimeFeedingSchedules = () => {
     if (!user) return;
 
     const fetchSchedules = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('feeding_schedules')
         .select(`
           *,
@@ -114,7 +114,7 @@ export const useRealtimeHealthRecords = () => {
     if (!user) return;
 
     const fetchHealthRecords = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('health_records')
         .select(`
           *,
