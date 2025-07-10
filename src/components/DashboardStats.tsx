@@ -1,4 +1,6 @@
 
+import React, { Fragment } from 'react';
+import type { FC } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -13,7 +15,7 @@ import {
 import { usePonds } from "@/hooks/usePonds";
 import { useRealtimeFeedingSchedules, useRealtimeHealthRecords } from "@/hooks/useRealtimeData";
 
-const DashboardStats = () => {
+const DashboardStats: FC = () => {
   const { ponds, loading: pondsLoading } = usePonds();
   const { schedules, loading: schedulesLoading } = useRealtimeFeedingSchedules();
   const { healthRecords, loading: healthLoading } = useRealtimeHealthRecords();
@@ -41,7 +43,7 @@ const DashboardStats = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <Fragment>
       <div>
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Dashboard</h2>
         <p className="text-gray-600">Ringkasan keseluruhan budidaya ikan lele Anda</p>
@@ -179,7 +181,7 @@ const DashboardStats = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Fragment>
   );
 };
 
