@@ -1,9 +1,9 @@
-import * as React from "react"
+import React, { type TextareaHTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils"
 
-export interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+// Intentionally extending for future props, see linter rule
+export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> { /* intentionally empty */ }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...props }, ref) => {

@@ -152,7 +152,7 @@ export const PondForm = ({ isOpen, onClose, onSubmit, editingPond, isLoading }: 
 
           <div className="space-y-2">
             <Label htmlFor="status">Status Kolam</Label>
-            <Select value={formData.status} onValueChange={(value: any) => setFormData({...formData, status: value})}>
+            <Select value={formData.status} onValueChange={(value: PondFormData['status']) => setFormData({...formData, status: value})}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
