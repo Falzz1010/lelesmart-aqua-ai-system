@@ -12,6 +12,8 @@
       "react-router-dom": ["./node_modules/react-router-dom"],
       "lucide-react": ["./node_modules/lucide-react"],
       "class-variance-authority": ["./node_modules/class-variance-authority"],
+      "@radix-ui/react-dialog": ["./node_modules/@radix-ui/react-dialog"],
+      "cmdk": ["./node_modules/cmdk"],
       "react/jsx-runtime": ["./node_modules/react/jsx-runtime"]
     },
     "noImplicitAny": false,
