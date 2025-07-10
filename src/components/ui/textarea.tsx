@@ -1,4 +1,8 @@
-import { forwardRef, type TextareaHTMLAttributes } from "react";
+/** @jsxRuntime classic */
+/** @jsx React.createElement */
+/** @jsxFrag React.Fragment */
+import React, { forwardRef } from "react";
+import type { TextareaHTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils"
 
@@ -13,9 +17,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLText
         ref={ref}
         {...props}
       />
-    )
+    );
   }
-)
+);
 Textarea.displayName = "Textarea"
 
 export { Textarea }
