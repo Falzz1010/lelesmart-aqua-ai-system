@@ -8,6 +8,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "react": ["./node_modules/react"],
+      "react-router-dom": ["./node_modules/react-router-dom"],
+      "lucide-react": ["./node_modules/lucide-react"],
+      "class-variance-authority": ["./node_modules/class-variance-authority"],
       "react/jsx-runtime": ["./node_modules/react/jsx-runtime"]
     },
     "noImplicitAny": false,
