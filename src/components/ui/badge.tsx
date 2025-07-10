@@ -1,5 +1,4 @@
-import React from "react";
-import type { FC, ReactNode, HTMLAttributes } from "react";
+import React, { type FC, type ReactNode, type HTMLAttributes } from "react";
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"

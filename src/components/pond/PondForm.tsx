@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Pond } from "@/hooks/usePonds";
+import type { FormEvent } from 'react';
 
 interface PondFormProps {
   isOpen: boolean;
@@ -34,7 +35,7 @@ export const PondForm = ({ isOpen, onClose, onSubmit, editingPond, isLoading }: 
     status: editingPond?.status || "active"
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
