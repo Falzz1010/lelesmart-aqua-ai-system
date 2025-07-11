@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -209,6 +210,26 @@ export const useRealtimeFeedingSchedules = () => {
 
     if (user) {
       loadSchedules();
+
+      // Set up realtime subscription
+      const channel = supabase
+        .channel('feeding_schedules_realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'feeding_schedules',
+          },
+          () => {
+            fetchSchedules();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     } else {
       setLoading(false);
     }
@@ -284,6 +305,26 @@ export const useRealtimeHealthRecords = () => {
 
     if (user) {
       loadHealthRecords();
+
+      // Set up realtime subscription
+      const channel = supabase
+        .channel('health_records_realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'health_records',
+          },
+          () => {
+            fetchHealthRecords();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     } else {
       setLoading(false);
     }
@@ -300,18 +341,77 @@ export const useRealtimeHealthRecords = () => {
 export const useRealtimeWaterQuality = () => {
   const [waterQualityLogs, setWaterQualityLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  // Mock data for now since we don't have a water quality table yet
+  const fetchWaterQuality = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch water quality data from ponds table
+      const { data, error } = await supabase
+        .from('ponds')
+        .select('id, name, water_temperature, ph_level, updated_at')
+        .eq('user_id', user.id)
+        .not('water_temperature', 'is', null)
+        .not('ph_level', 'is', null)
+        .order('updated_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching water quality:', error);
+        return;
+      }
+
+      const waterQualityData = (data || []).map(pond => ({
+        id: pond.id,
+        pond_name: pond.name,
+        temperature: pond.water_temperature,
+        ph_level: pond.ph_level,
+        created_at: pond.updated_at
+      }));
+
+      setWaterQualityLogs(waterQualityData);
+    } catch (error) {
+      console.error('Error fetching water quality:', error);
+    }
+  };
+
   useEffect(() => {
-    setWaterQualityLogs([
-      { id: 1, temperature: 28.5, ph_level: 7.2, created_at: new Date().toISOString() },
-      { id: 2, temperature: 29.1, ph_level: 7.1, created_at: new Date().toISOString() },
-    ]);
-    setLoading(false);
-  }, []);
+    const loadWaterQuality = async () => {
+      setLoading(true);
+      await fetchWaterQuality();
+      setLoading(false);
+    };
+
+    if (user) {
+      loadWaterQuality();
+
+      // Set up realtime subscription for pond updates
+      const channel = supabase
+        .channel('water_quality_realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'ponds',
+          },
+          () => {
+            fetchWaterQuality();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   return {
     waterQualityLogs,
     loading,
+    refetch: fetchWaterQuality,
   };
 };

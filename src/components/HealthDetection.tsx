@@ -19,7 +19,9 @@ import {
   FileImage,
   Plus,
   Bot,
-  Sparkles
+  Sparkles,
+  TrendingUp,
+  TrendingDown
 } from "lucide-react";
 import { usePonds } from "@/hooks/usePonds";
 import { useRealtimeHealthRecords } from "@/hooks/useRealtimeData";
@@ -45,7 +47,58 @@ const HealthDetection = () => {
     treatment: ""
   });
 
-  // Mock analysis results for demonstration
+  // Calculate real health statistics
+  const calculateHealthStats = () => {
+    if (healthRecords.length === 0) {
+      return {
+        totalRecords: 0,
+        healthyCount: 0,
+        sickCount: 0,
+        criticalCount: 0,
+        healthyPercentage: 0,
+        trend: 'stable',
+        recentActivity: 0
+      };
+    }
+
+    const healthyCount = healthRecords.filter(r => r.health_status === 'healthy').length;
+    const sickCount = healthRecords.filter(r => r.health_status === 'sick').length;
+    const criticalCount = healthRecords.filter(r => r.health_status === 'critical').length;
+    
+    // Calculate trend based on recent records
+    const recentRecords = healthRecords.slice(0, 5);
+    const olderRecords = healthRecords.slice(5, 10);
+    
+    const recentHealthyRatio = recentRecords.length > 0 
+      ? recentRecords.filter(r => r.health_status === 'healthy').length / recentRecords.length 
+      : 0;
+    const olderHealthyRatio = olderRecords.length > 0 
+      ? olderRecords.filter(r => r.health_status === 'healthy').length / olderRecords.length 
+      : recentHealthyRatio;
+    
+    let trend = 'stable';
+    if (recentHealthyRatio > olderHealthyRatio + 0.1) trend = 'improving';
+    else if (recentHealthyRatio < olderHealthyRatio - 0.1) trend = 'declining';
+
+    // Recent activity (last 7 days)
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const recentActivity = healthRecords.filter(r => 
+      new Date(r.created_at) >= weekAgo
+    ).length;
+
+    return {
+      totalRecords: healthRecords.length,
+      healthyCount,
+      sickCount,
+      criticalCount,
+      healthyPercentage: (healthyCount / healthRecords.length) * 100,
+      trend,
+      recentActivity
+    };
+  };
+
+  // Mock analysis for image upload (keeping this as example)
   const mockAnalysis = {
     healthScore: 85,
     status: "healthy",
@@ -124,12 +177,52 @@ const HealthDetection = () => {
       return;
     }
 
+    // Prepare context with real health data
+    const healthContext = {
+      totalPonds: ponds.length,
+      pondsData: ponds.map(pond => ({
+        name: pond.name,
+        fishCount: pond.fish_count,
+        fishAge: pond.fish_age_days,
+        waterTemp: pond.water_temperature,
+        phLevel: pond.ph_level,
+        size: pond.size_m2,
+        depth: pond.depth_m
+      })),
+      recentHealthRecords: healthRecords.slice(0, 5).map(record => ({
+        pond: record.ponds?.name || 'Unknown',
+        status: record.health_status,
+        symptoms: record.symptoms,
+        treatment: record.treatment,
+        date: record.created_at
+      })),
+      healthStats: calculateHealthStats()
+    };
+
+    const fullPrompt = `
+Data Kesehatan Real-time dari Sistem:
+${JSON.stringify(healthContext, null, 2)}
+
+Observasi Pengguna:
+${healthPrompt}
+
+Berdasarkan data real-time dan observasi pengguna, berikan analisis kesehatan ikan yang komprehensif mencakup:
+1. Diagnosis berdasarkan gejala dan riwayat
+2. Tingkat keparahan dan risiko
+3. Rekomendasi pengobatan spesifik
+4. Langkah pencegahan
+5. Prediksi prognosis
+6. Tindakan darurat jika diperlukan
+
+Fokus pada data aktual dari sistem dan berikan rekomendasi yang dapat ditindaklanjuti.
+    `;
+
     try {
-      const result = await analyzeHealth(healthPrompt);
+      const result = await analyzeHealth(fullPrompt);
       setAiAnalysis(result);
       toast({
         title: "Analisis Selesai",
-        description: "AI telah menganalisis kondisi kesehatan ikan"
+        description: "AI telah menganalisis kondisi kesehatan berdasarkan data real-time"
       });
     } catch (error) {
       toast({
@@ -196,6 +289,27 @@ const HealthDetection = () => {
     }
   };
 
+  const getTrendIcon = (trend) => {
+    switch (trend) {
+      case 'improving':
+        return <TrendingUp className="h-4 w-4 text-green-600" />;
+      case 'declining':
+        return <TrendingDown className="h-4 w-4 text-red-600" />;
+      default:
+        return <Activity className="h-4 w-4 text-blue-600" />;
+    }
+  };
+
+  const getTrendText = (trend) => {
+    switch (trend) {
+      case 'improving': return 'Membaik';
+      case 'declining': return 'Menurun';
+      default: return 'Stabil';
+    }
+  };
+
+  const healthStats = calculateHealthStats();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -209,7 +323,7 @@ const HealthDetection = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Deteksi Kesehatan Ikan AI</h2>
-          <p className="text-gray-600 mt-1">Upload foto atau deskripsikan kondisi ikan untuk analisis kesehatan otomatis</p>
+          <p className="text-gray-600 mt-1">Analisis kesehatan berdasarkan data real-time dan AI</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -285,26 +399,104 @@ const HealthDetection = () => {
         </Dialog>
       </div>
 
+      {/* Health Statistics Dashboard */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-white/70 backdrop-blur-sm border-green-100/50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-gray-600">Total Catatan</p>
+                <p className="text-2xl font-bold text-gray-800">{healthStats.totalRecords}</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <Activity className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-blue-600">Real-time</span>
+                </div>
+              </div>
+              <Heart className="h-8 w-8 text-blue-600 flex-shrink-0" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/70 backdrop-blur-sm border-green-100/50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-gray-600">Tingkat Kesehatan</p>
+                <p className="text-2xl font-bold text-green-600">{healthStats.healthyPercentage.toFixed(0)}%</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm text-green-600">Sehat</span>
+                </div>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-600 flex-shrink-0" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/70 backdrop-blur-sm border-yellow-100/50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-gray-600">Tren Kesehatan</p>
+                <p className="text-2xl font-bold text-gray-800">{getTrendText(healthStats.trend)}</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  {getTrendIcon(healthStats.trend)}
+                  <span className="text-sm text-gray-600">7 hari terakhir</span>
+                </div>
+              </div>
+              {getTrendIcon(healthStats.trend)}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/70 backdrop-blur-sm border-orange-100/50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-gray-600">Aktivitas Minggu Ini</p>
+                <p className="text-2xl font-bold text-orange-600">{healthStats.recentActivity}</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <Clock className="h-4 w-4 text-orange-600" />
+                  <span className="text-sm text-orange-600">Catatan baru</span>
+                </div>
+              </div>
+              <Clock className="h-8 w-8 text-orange-600 flex-shrink-0" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* AI Text Analysis */}
+        {/* AI Text Analysis - Enhanced with real data context */}
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Bot className="h-5 w-5 text-purple-600" />
-              <span>Analisis AI Berbasis Teks</span>
+              <span>Analisis AI Berbasis Data Real-time</span>
             </CardTitle>
             <CardDescription>
-              Deskripsikan kondisi ikan untuk mendapatkan analisis AI
+              AI akan menganalisis berdasarkan riwayat kesehatan dan data kolam Anda
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {healthStats.totalRecords > 0 && (
+              <div className="p-3 bg-blue-50/50 rounded-lg text-sm">
+                <p className="font-medium text-blue-800 mb-1">Konteks Data Anda:</p>
+                <ul className="text-blue-700 space-y-1">
+                  <li>• {healthStats.totalRecords} catatan kesehatan tersimpan</li>
+                  <li>• {healthStats.healthyCount} catatan sehat, {healthStats.sickCount} sakit, {healthStats.criticalCount} kritis</li>
+                  <li>• Tren kesehatan: {getTrendText(healthStats.trend)}</li>
+                  <li>• {ponds.length} kolam aktif dalam sistem</li>
+                </ul>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="health-prompt">Deskripsi Kondisi Ikan</Label>
               <Textarea
                 id="health-prompt"
                 value={healthPrompt}
                 onChange={(e) => setHealthPrompt(e.target.value)}
-                placeholder="Contoh: Ikan terlihat lemas, nafsu makan berkurang, ada bercak putih di tubuh..."
+                placeholder="Contoh: Ikan terlihat lemas, nafsu makan berkurang, ada bercak putih di tubuh, gerakan tidak normal..."
                 rows={4}
               />
             </div>
@@ -316,19 +508,24 @@ const HealthDetection = () => {
               {aiLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                  Menganalisis...
+                  Menganalisis dengan Data Real-time...
                 </>
               ) : (
                 <>
                   <Sparkles className="h-4 w-4 mr-2" />
-                  Analisis dengan AI
+                  Analisis dengan AI (Menggunakan Data Real-time)
                 </>
               )}
             </Button>
+            {healthStats.totalRecords === 0 && (
+              <p className="text-sm text-gray-500 text-center">
+                Tambahkan beberapa catatan kesehatan untuk analisis yang lebih akurat
+              </p>
+            )}
           </CardContent>
         </Card>
 
-        {/* Upload Section */}
+        {/* Upload Section - Keeping existing functionality */}
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -411,14 +608,17 @@ const HealthDetection = () => {
           </CardContent>
         </Card>
 
-        {/* AI Analysis Results */}
+        {/* AI Analysis Results - Enhanced */}
         {aiAnalysis && (
           <Card className="bg-white/70 backdrop-blur-sm border-purple-100/50 lg:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Bot className="h-5 w-5 text-purple-600" />
-                <span>Hasil Analisis AI</span>
+                <span>Hasil Analisis AI (Berdasarkan Data Real-time)</span>
               </CardTitle>
+              <CardDescription>
+                Analisis komprehensif berdasarkan riwayat {healthStats.totalRecords} catatan kesehatan
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -447,7 +647,7 @@ const HealthDetection = () => {
 
               {aiAnalysis.diagnosis && (
                 <div className="p-4 bg-blue-50/50 rounded-lg">
-                  <h4 className="font-semibold text-blue-800 mb-2">🔍 Diagnosis:</h4>
+                  <h4 className="font-semibold text-blue-800 mb-2">🔍 Diagnosis Berdasarkan Data:</h4>
                   <p className="text-blue-700">{aiAnalysis.diagnosis}</p>
                 </div>
               )}
@@ -554,20 +754,26 @@ const HealthDetection = () => {
           </Card>
         )}
 
-        {/* Recent Health Records */}
+        {/* Recent Health Records - Enhanced with better data display */}
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50 lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Clock className="h-5 w-5 text-blue-600" />
-              <span>Riwayat Kesehatan Terbaru</span>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Clock className="h-5 w-5 text-blue-600" />
+                <span>Riwayat Kesehatan Real-time</span>
+              </div>
+              <Badge variant="outline">{healthStats.totalRecords} Total Catatan</Badge>
             </CardTitle>
+            <CardDescription>
+              Data kesehatan terbaru dengan tren: {getTrendText(healthStats.trend)}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {healthRecords.length === 0 ? (
               <div className="text-center py-8">
                 <Heart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500">Belum ada catatan kesehatan</p>
-                <p className="text-sm text-gray-400">Tambah catatan kesehatan untuk memulai monitoring</p>
+                <p className="text-sm text-gray-400">Tambah catatan kesehatan untuk memulai monitoring real-time</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -576,28 +782,40 @@ const HealthDetection = () => {
                     <div className="flex items-center justify-between mb-3">
                       <Badge variant="outline">{record.ponds?.name || 'Unknown'}</Badge>
                       <span className="text-xs text-gray-500">
-                        {new Date(record.created_at).toLocaleDateString()}
+                        {new Date(record.created_at).toLocaleDateString('id-ID')} {' '}
+                        {new Date(record.created_at).toLocaleTimeString('id-ID', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
                       </span>
                     </div>
                     
                     <div className="flex items-center space-x-3 mb-3">
                       <div className={`w-3 h-3 rounded-full ${getHealthBadge(record.health_status)}`}></div>
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium text-gray-800">{getStatusText(record.health_status)}</p>
                         {record.symptoms && (
-                          <p className="text-sm text-gray-600 truncate">{record.symptoms}</p>
+                          <p className="text-sm text-gray-600 line-clamp-2">{record.symptoms}</p>
                         )}
                       </div>
                     </div>
 
                     {record.treatment && (
-                      <div className="mt-2">
-                        <p className="text-xs text-gray-500">Pengobatan:</p>
-                        <p className="text-sm text-gray-700 truncate">{record.treatment}</p>
+                      <div className="mt-2 p-2 bg-green-50/50 rounded">
+                        <p className="text-xs text-gray-500 font-medium">Pengobatan:</p>
+                        <p className="text-sm text-gray-700 line-clamp-2">{record.treatment}</p>
                       </div>
                     )}
                   </div>
                 ))}
+              </div>
+            )}
+            
+            {healthRecords.length > 6 && (
+              <div className="mt-4 text-center">
+                <Button variant="outline" size="sm">
+                  Lihat Semua {healthRecords.length} Catatan
+                </Button>
               </div>
             )}
           </CardContent>
@@ -607,35 +825,35 @@ const HealthDetection = () => {
       {/* Tips & Guidelines */}
       <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
         <CardHeader>
-          <CardTitle>Tips Pengambilan Foto yang Baik</CardTitle>
+          <CardTitle>Tips Monitoring Kesehatan Real-time</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <h4 className="font-medium text-gray-800 flex items-center">
                 <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                Pencahayaan
+                Observasi Rutin
               </h4>
               <p className="text-sm text-gray-600">
-                Gunakan cahaya natural atau lampu terang. Hindari bayangan pada ikan.
+                Lakukan pencatatan kesehatan minimal 2x seminggu untuk tren yang akurat.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium text-gray-800 flex items-center">
                 <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                Jarak & Sudut
+                Detail Gejala
               </h4>
               <p className="text-sm text-gray-600">
-                Ambil foto dari jarak 20-30cm dengan sudut 45° untuk hasil terbaik.
+                Catat gejala spesifik seperti perubahan warna, perilaku, dan nafsu makan.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium text-gray-800 flex items-center">
                 <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                Kejelasan
+                Konsultasi AI
               </h4>
               <p className="text-sm text-gray-600">
-                Pastikan foto tidak blur dan ikan terlihat jelas tanpa gangguan objek lain.
+                Gunakan AI analysis untuk mendapat insight berdasarkan data historis Anda.
               </p>
             </div>
           </div>
