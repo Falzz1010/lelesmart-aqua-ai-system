@@ -93,7 +93,7 @@ export const useRealtimeData = () => {
         },
         (payload) => {
           console.log('Realtime feeding schedule change:', payload);
-          fetchFeedingSchedules(); // Refetch to get proper joins
+          fetchFeedingSchedules();
         }
       )
       .subscribe();
@@ -109,7 +109,7 @@ export const useRealtimeData = () => {
         },
         (payload) => {
           console.log('Realtime health record change:', payload);
-          fetchHealthRecords(); // Refetch to get proper joins
+          fetchHealthRecords();
         }
       )
       .subscribe();
@@ -211,7 +211,6 @@ export const useRealtimeFeedingSchedules = () => {
     if (user) {
       loadSchedules();
 
-      // Set up realtime subscription
       const channel = supabase
         .channel('feeding_schedules_realtime')
         .on(
@@ -306,7 +305,6 @@ export const useRealtimeHealthRecords = () => {
     if (user) {
       loadHealthRecords();
 
-      // Set up realtime subscription
       const channel = supabase
         .channel('health_records_realtime')
         .on(
@@ -347,7 +345,6 @@ export const useRealtimeWaterQuality = () => {
     if (!user) return;
 
     try {
-      // Fetch water quality data from ponds table
       const { data, error } = await supabase
         .from('ponds')
         .select('id, name, water_temperature, ph_level, updated_at')
@@ -385,7 +382,6 @@ export const useRealtimeWaterQuality = () => {
     if (user) {
       loadWaterQuality();
 
-      // Set up realtime subscription for pond updates
       const channel = supabase
         .channel('water_quality_realtime')
         .on(

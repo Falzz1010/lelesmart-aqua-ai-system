@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge"; 
@@ -44,63 +45,55 @@ const GrowthPredictions = () => {
     const avgAge = ponds.reduce((sum, pond) => sum + pond.fish_age_days, 0) / ponds.length;
     const totalFeed = schedules.reduce((sum, schedule) => sum + schedule.feed_amount_kg, 0);
     const totalBiomass = ponds.reduce((sum, pond) => {
-      // Estimate biomass based on age and fish count
-      const avgWeight = Math.max(50 + (pond.fish_age_days * 20), 50); // grams
-      return sum + (pond.fish_count * avgWeight / 1000); // kg
+      const avgWeight = Math.max(50 + (pond.fish_age_days * 20), 50);
+      return sum + (pond.fish_count * avgWeight / 1000);
     }, 0);
 
-    // Calculate survival rate based on health records
     const healthyPonds = healthRecords.filter(record => record.health_status === 'healthy').length;
     const survivalRate = healthRecords.length > 0 ? (healthyPonds / healthRecords.length) * 100 : 85;
 
     return {
-      avgGrowthRate: avgAge > 0 ? avgAge * 0.8 : 0, // Estimate growth rate
-      totalBiomass: totalBiomass / 1000, // Convert to tons
+      avgGrowthRate: avgAge > 0 ? avgAge * 0.8 : 0,
+      totalBiomass: totalBiomass,
       avgSurvivalRate: Math.min(survivalRate, 100),
       avgFCR: totalFeed > 0 && totalBiomass > 0 ? totalFeed / totalBiomass : 1.2
     };
   };
 
   useEffect(() => {
-    // Calculate predictions based on real data
     const calculatePredictions = () => {
       return ponds.map(pond => {
         const currentAge = pond.fish_age_days || 0;
-        const targetAge = 90; // Standard harvest age for catfish
+        const targetAge = 90;
         const progress = Math.min((currentAge / targetAge) * 100, 100);
         
-        // Calculate estimated harvest date
         const daysRemaining = Math.max(targetAge - currentAge, 0);
         const harvestDate = new Date();
         harvestDate.setDate(harvestDate.getDate() + daysRemaining);
         
-        // Estimate weight based on age and feeding data
         const pondSchedules = schedules.filter(s => s.pond_id === pond.id);
         const totalFeedGiven = pondSchedules.reduce((sum, s) => sum + s.feed_amount_kg, 0);
         const feedingFactor = totalFeedGiven > 0 ? totalFeedGiven * 0.05 : 0;
         const estimatedWeight = Math.max(50 + (currentAge * 25) + feedingFactor, 50);
         
-        // Calculate expected yield based on health status
         const recentHealth = healthRecords
           .filter(r => r.pond_id === pond.id)
           .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
         
-        let survivalRate = 0.85; // Base survival rate
+        let survivalRate = 0.85;
         if (recentHealth?.health_status === 'healthy') survivalRate = 0.95;
         else if (recentHealth?.health_status === 'sick') survivalRate = 0.70;
         else if (recentHealth?.health_status === 'critical') survivalRate = 0.50;
         
         const expectedCount = Math.floor(pond.fish_count * survivalRate);
-        const expectedYield = (expectedCount * estimatedWeight) / 1000; // Convert to tons
+        const expectedYield = (expectedCount * estimatedWeight) / 1000;
         
-        // Calculate profit margin based on multiple factors
-        let profitMargin = 25; // Base profit margin
+        let profitMargin = 25;
         if (recentHealth?.health_status === 'healthy') profitMargin += 15;
         else if (recentHealth?.health_status === 'sick') profitMargin -= 10;
         else if (recentHealth?.health_status === 'critical') profitMargin -= 20;
         
-        // Adjust based on feeding efficiency
-        const feedingEfficiency = pondSchedules.length / Math.max(currentAge / 7, 1); // Weekly feeding
+        const feedingEfficiency = pondSchedules.length / Math.max(currentAge / 7, 1);
         if (feedingEfficiency > 1) profitMargin += 5;
         else if (feedingEfficiency < 0.5) profitMargin -= 5;
         
@@ -125,10 +118,9 @@ const GrowthPredictions = () => {
   const generateRecommendations = (pond, age, healthRecord, pondSchedules) => {
     const recommendations = [];
     
-    // Age-based recommendations
     if (age < 30) {
       recommendations.push("Tingkatkan frekuensi pakan untuk pertumbuhan optimal");
-      if (pondSchedules.length < 14) { // Less than 2 feedings per week for 2 weeks
+      if (pondSchedules.length < 14) {
         recommendations.push("Jadwal pakan masih kurang, tambahkan lebih banyak");
       }
     } else if (age > 80) {
@@ -138,7 +130,6 @@ const GrowthPredictions = () => {
       recommendations.push("Pertahankan pola pakan saat ini");
     }
     
-    // Health-based recommendations
     if (healthRecord?.health_status === 'sick') {
       recommendations.push("Monitor kesehatan lebih ketat - ada riwayat sakit");
       recommendations.push("Pertimbangkan treatment khusus sebelum panen");
@@ -151,7 +142,6 @@ const GrowthPredictions = () => {
       recommendations.push("Kondisi kesehatan baik, lanjutkan perawatan");
     }
     
-    // Density-based recommendations
     const density = pond.fish_count / pond.size_m2;
     if (density > 20) {
       recommendations.push("Kepadatan ikan tinggi, pertimbangkan panen bertahap");
@@ -161,16 +151,15 @@ const GrowthPredictions = () => {
   };
 
   const handleAIPrediction = async () => {
-    if (!growthPrompt.trim()) {
+    if (ponds.length === 0) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Mohon masukkan data kolam untuk prediksi"
+        description: "Tidak ada data kolam untuk dianalisis"
       });
       return;
     }
 
-    // Prepare context with real pond data
     const contextData = ponds.map(pond => {
       const pondSchedules = schedules.filter(s => s.pond_id === pond.id);
       const pondHealth = healthRecords.filter(r => r.pond_id === pond.id);
@@ -195,8 +184,8 @@ const GrowthPredictions = () => {
 Data Kolam Real-time:
 ${JSON.stringify(contextData, null, 2)}
 
-Informasi Tambahan dari User:
-${growthPrompt}
+Informasi Tambahan:
+${growthPrompt || 'Berikan analisis umum berdasarkan data kolam yang ada'}
 
 Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan rekomendasi panen yang spesifik. Sertakan:
 1. Tingkat pertumbuhan berdasarkan umur dan pakan
@@ -225,22 +214,20 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
 
   const growthMetrics = calculateGrowthMetrics();
 
-  // Market predictions based on real data patterns
   const calculateMarketPredictions = () => {
     const avgAge = ponds.length > 0 ? ponds.reduce((sum, pond) => sum + pond.fish_age_days, 0) / ponds.length : 0;
     const healthyPonds = healthRecords.filter(record => record.health_status === 'healthy').length;
     const totalPonds = ponds.length;
     const healthRatio = totalPonds > 0 ? healthyPonds / totalPonds : 0;
     
-    // Calculate price prediction based on season and readiness
     let basePrice = 16000;
     let priceChange = 0;
     
-    if (avgAge > 70) { // Near harvest
-      priceChange += 5; // Demand increases
+    if (avgAge > 70) {
+      priceChange += 5;
       basePrice += 500;
     }
-    if (healthRatio > 0.8) { // Healthy stock
+    if (healthRatio > 0.8) {
       priceChange += 3;
       basePrice += 300;
     }
@@ -265,11 +252,6 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
     if (progress >= 60) return "bg-blue-500"; 
     if (progress >= 40) return "bg-yellow-500";
     return "bg-orange-500";
-  };
-
-  const getTrendIcon = (trend) => {
-    if (trend.startsWith('+')) return <TrendingUp className="h-4 w-4 text-green-600" />;
-    return <TrendingUp className="h-4 w-4 text-red-600 rotate-180" />;
   };
 
   return (
@@ -381,7 +363,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
         </Card>
       )}
 
-      {/* Key Metrics - Now using real data */}
+      {/* Key Metrics - Real Data */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardContent className="p-3 sm:p-4">
@@ -455,7 +437,6 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
             <Fish className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">Belum Ada Data Kolam</h3>
             <p className="text-sm sm:text-base text-gray-500 mb-4">Tambahkan kolam untuk melihat prediksi panen real-time</p>
-            <Button className="text-sm sm:text-base">Tambah Kolam</Button>
           </CardContent>
         </Card>
       ) : (
@@ -525,7 +506,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
         </div>
       )}
 
-      {/* Market Analysis - Updated with real data */}
+      {/* Market Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardHeader>
@@ -565,11 +546,6 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
               }`}>
                 📈 Tren Pasar: {marketPredictions.marketTrend === 'bullish' ? 'Bullish' : 'Bearish'}
               </h4>
-              <p className={`text-xs sm:text-sm mb-2 ${
-                marketPredictions.marketTrend === 'bullish' ? 'text-green-700' : 'text-red-700'
-              }`}>
-                Prediksi berdasarkan kondisi kolam Anda saat ini.
-              </p>
               <div className={`text-xs ${
                 marketPredictions.marketTrend === 'bullish' ? 'text-green-600' : 'text-red-600'
               }`}>
