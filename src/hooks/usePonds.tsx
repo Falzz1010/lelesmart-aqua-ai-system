@@ -1,75 +1,183 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from './useAuth';
 import { useToast } from '@/hooks/use-toast';
-
-export interface Pond {
-  id: string;
-  name: string;
-  size_m2: number;
-  depth_m: number;
-  fish_count: number;
-  fish_age_days: number;
-  status: 'active' | 'maintenance' | 'inactive';
-  water_temperature?: number;
-  ph_level?: number;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-}
+import type { Pond, PondInsert, PondUpdate } from '@/types/database';
 
 export const usePonds = () => {
   const [ponds, setPonds] = useState<Pond[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
+  // Fetch ponds
+  const fetchPonds = async () => {
     if (!user) {
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
 
-    fetchPonds();
-    setupRealtimeSubscription();
-  }, [user]);
-
-  const fetchPonds = async () => {
     try {
+      setIsLoading(true);
       const { data, error } = await supabase
-        .from('ponds' as any)
+        .from('ponds')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      
-      if (error) throw error;
+
+      if (error) {
+        console.error('Error fetching ponds:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memuat data kolam",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setPonds(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching ponds:', error);
       toast({
-        variant: "destructive",
         title: "Error",
-        description: "Gagal memuat data kolam"
+        description: "Terjadi kesalahan saat memuat data",
+        variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const setupRealtimeSubscription = () => {
+  // Add new pond
+  const addPond = async (pondData: PondInsert) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('ponds')
+        .insert([{ ...pondData, user_id: user.id }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error adding pond:', error);
+        toast({
+          title: "Error",
+          description: "Gagal menambah kolam baru",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPonds(prev => [data, ...prev]);
+      toast({
+        title: "Berhasil",
+        description: "Kolam baru berhasil ditambahkan",
+      });
+
+      return data;
+    } catch (error) {
+      console.error('Error adding pond:', error);
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat menambah kolam",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Update pond
+  const updatePond = async (id: string, updates: PondUpdate) => {
+    try {
+      const { data, error } = await supabase
+        .from('ponds')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating pond:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memperbarui kolam",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPonds(prev => prev.map(pond => pond.id === id ? data : pond));
+      toast({
+        title: "Berhasil",
+        description: "Data kolam berhasil diperbarui",
+      });
+
+      return data;
+    } catch (error) {
+      console.error('Error updating pond:', error);
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat memperbarui kolam",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Delete pond
+  const deletePond = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('ponds')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting pond:', error);
+        toast({
+          title: "Error",
+          description: "Gagal menghapus kolam",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPonds(prev => prev.filter(pond => pond.id !== id));
+      toast({
+        title: "Berhasil",
+        description: "Kolam berhasil dihapus",
+      });
+    } catch (error) {
+      console.error('Error deleting pond:', error);
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat menghapus kolam",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchPonds();
+  }, [user]);
+
+  // Set up real-time subscription
+  useEffect(() => {
+    if (!user) return;
+
     const channel = supabase
-      .channel('ponds-changes')
+      .channel('ponds_changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'ponds',
-          filter: `user_id=eq.${user?.id}`
+          filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log('Pond change:', payload);
+          console.log('Realtime pond change:', payload);
+          
           if (payload.eventType === 'INSERT') {
             setPonds(prev => [payload.new as Pond, ...prev]);
           } else if (payload.eventType === 'UPDATE') {
@@ -86,98 +194,14 @@ export const usePonds = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  };
-
-  const createPond = async (pondData: Omit<Pond, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => {
-    try {
-      const { data, error } = await supabase
-        .from('ponds' as any)
-        .insert([{
-          ...pondData,
-          user_id: user?.id
-        }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Berhasil",
-        description: "Kolam berhasil ditambahkan"
-      });
-      
-      return data;
-    } catch (error: any) {
-      console.error('Error creating pond:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Gagal menambahkan kolam"
-      });
-      throw error;
-    }
-  };
-
-  const updatePond = async (id: string, updates: Partial<Pond>) => {
-    try {
-      const { data, error } = await supabase
-        .from('ponds' as any)
-        .update(updates)
-        .eq('id', id)
-        .eq('user_id', user?.id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Berhasil",
-        description: "Kolam berhasil diupdate"
-      });
-      
-      return data;
-    } catch (error: any) {
-      console.error('Error updating pond:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Gagal mengupdate kolam"
-      });
-      throw error;
-    }
-  };
-
-  const deletePond = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('ponds' as any)
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user?.id);
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Berhasil",
-        description: "Kolam berhasil dihapus"
-      });
-    } catch (error: any) {
-      console.error('Error deleting pond:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Gagal menghapus kolam"
-      });
-      throw error;
-    }
-  };
+  }, [user]);
 
   return {
     ponds,
-    loading,
-    createPond,
+    isLoading,
+    addPond,
     updatePond,
     deletePond,
-    refetch: fetchPonds
+    refetchPonds: fetchPonds,
   };
 };
