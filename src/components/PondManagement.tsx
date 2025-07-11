@@ -234,7 +234,7 @@ const PondManagement = () => {
         }
       }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+          <div className="flex flex-col space-y-1.5 text-center sm:text-left">
             <DialogTitle>
               {editingPond ? 'Edit Kolam' : 'Tambah Kolam Baru'}
             </DialogTitle>
@@ -244,7 +244,7 @@ const PondManagement = () => {
                 : 'Isi data kolam yang akan ditambahkan ke sistem'
               }
             </DialogDescription>
-          </DialogHeader>
+          </div>
           <PondForm
             onSubmit={handleSubmit}
             isLoading={isLoading}
