@@ -15,7 +15,7 @@ import { usePonds } from "@/hooks/usePonds";
 import { useRealtimeFeedingSchedules, useRealtimeHealthRecords, useRealtimeWaterQuality } from "@/hooks/useRealtimeData";
 
 const DashboardStats = () => {
-  const { ponds, loading: pondsLoading } = usePonds();
+  const { ponds, isLoading: pondsLoading } = usePonds();
   const { schedules, loading: schedulesLoading } = useRealtimeFeedingSchedules();
   const { healthRecords, loading: healthLoading } = useRealtimeHealthRecords();
   const { waterQualityLogs, loading: waterLoading } = useRealtimeWaterQuality();

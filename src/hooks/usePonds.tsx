@@ -36,7 +36,7 @@ export const usePonds = () => {
         return;
       }
 
-      setPonds(data || []);
+      setPonds((data || []) as Pond[]);
     } catch (error) {
       console.error('Error fetching ponds:', error);
       toast({
@@ -70,13 +70,13 @@ export const usePonds = () => {
         return;
       }
 
-      setPonds(prev => [data, ...prev]);
+      setPonds(prev => [data as Pond, ...prev]);
       toast({
         title: "Berhasil",
         description: "Kolam baru berhasil ditambahkan",
       });
 
-      return data;
+      return data as Pond;
     } catch (error) {
       console.error('Error adding pond:', error);
       toast({
@@ -107,13 +107,13 @@ export const usePonds = () => {
         return;
       }
 
-      setPonds(prev => prev.map(pond => pond.id === id ? data : pond));
+      setPonds(prev => prev.map(pond => pond.id === id ? data as Pond : pond));
       toast({
         title: "Berhasil",
         description: "Data kolam berhasil diperbarui",
       });
 
-      return data;
+      return data as Pond;
     } catch (error) {
       console.error('Error updating pond:', error);
       toast({
@@ -205,3 +205,6 @@ export const usePonds = () => {
     refetchPonds: fetchPonds,
   };
 };
+
+// Export Pond type for components to use
+export type { Pond } from '@/types/database';

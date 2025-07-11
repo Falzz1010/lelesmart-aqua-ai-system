@@ -2,17 +2,16 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Filter, Grid, List } from "lucide-react";
-import { usePonds } from "@/hooks/usePonds";
-import { PondForm, PondFormData } from "@/components/pond/PondForm";
+import { usePonds, type Pond } from "@/hooks/usePonds";
+import { PondForm } from "@/components/pond/PondForm";
 import { PondCard } from "@/components/pond/PondCard";
-import { Pond } from "@/hooks/usePonds";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { PondInsert } from "@/types/database";
 
 const PondManagement = () => {
-  const { ponds, loading, createPond, updatePond, deletePond } = usePonds();
+  const { ponds, isLoading, addPond, updatePond, deletePond } = usePonds();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPond, setEditingPond] = useState<Pond | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,13 +36,13 @@ const PondManagement = () => {
     avgAge: ponds.length > 0 ? Math.round(ponds.reduce((sum, pond) => sum + (pond.fish_age_days || 0), 0) / ponds.length) : 0
   };
 
-  const handleSubmit = async (formData: PondFormData) => {
+  const handleSubmit = async (formData: PondInsert) => {
     setIsSubmitting(true);
     try {
       if (editingPond) {
         await updatePond(editingPond.id, formData);
       } else {
-        await createPond(formData);
+        await addPond(formData);
       }
       setIsDialogOpen(false);
       setEditingPond(null);
@@ -70,7 +69,7 @@ const PondManagement = () => {
     setIsDialogOpen(true);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -306,7 +305,6 @@ const PondManagement = () => {
               pond={pond}
               onEdit={handleEdit}
               onDelete={handleDelete}
-              viewMode={viewMode}
             />
           ))}
         </div>
@@ -314,10 +312,10 @@ const PondManagement = () => {
 
       {/* Pond Form Dialog */}
       <PondForm
-        isOpen={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false);
-          setEditingPond(null);
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) setEditingPond(null);
         }}
         onSubmit={handleSubmit}
         editingPond={editingPond}

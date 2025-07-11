@@ -19,7 +19,7 @@ export const useRealtimeData = () => {
         .from('feeding_schedules')
         .select(`
           *,
-          ponds!inner(user_id)
+          ponds!inner(user_id, name)
         `)
         .eq('ponds.user_id', user.id)
         .order('feeding_time', { ascending: true });
@@ -29,7 +29,7 @@ export const useRealtimeData = () => {
         return;
       }
 
-      setFeedingSchedules(data || []);
+      setFeedingSchedules((data || []) as FeedingSchedule[]);
     } catch (error) {
       console.error('Error fetching feeding schedules:', error);
     }
@@ -54,7 +54,7 @@ export const useRealtimeData = () => {
         return;
       }
 
-      setHealthRecords(data || []);
+      setHealthRecords((data || []) as HealthRecord[]);
     } catch (error) {
       console.error('Error fetching health records:', error);
     }
@@ -126,5 +126,193 @@ export const useRealtimeData = () => {
     isLoading,
     refetchFeedingSchedules: fetchFeedingSchedules,
     refetchHealthRecords: fetchHealthRecords,
+  };
+};
+
+// Individual hooks for specific functionality
+export const useRealtimeFeedingSchedules = () => {
+  const [schedules, setSchedules] = useState<FeedingSchedule[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  const fetchSchedules = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('feeding_schedules')
+        .select(`
+          *,
+          ponds!inner(user_id, name)
+        `)
+        .eq('ponds.user_id', user.id)
+        .order('feeding_time', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching feeding schedules:', error);
+        return;
+      }
+
+      setSchedules((data || []) as FeedingSchedule[]);
+    } catch (error) {
+      console.error('Error fetching feeding schedules:', error);
+    }
+  };
+
+  const createSchedule = async (scheduleData: Omit<FeedingSchedule, 'id' | 'created_at'>) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('feeding_schedules')
+        .insert([scheduleData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating schedule:', error);
+        throw error;
+      }
+
+      await fetchSchedules();
+      return data;
+    } catch (error) {
+      console.error('Error creating schedule:', error);
+      throw error;
+    }
+  };
+
+  const updateScheduleStatus = async (id: string, status: 'pending' | 'completed') => {
+    try {
+      const { error } = await supabase
+        .from('feeding_schedules')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating schedule status:', error);
+        throw error;
+      }
+
+      await fetchSchedules();
+    } catch (error) {
+      console.error('Error updating schedule status:', error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const loadSchedules = async () => {
+      setLoading(true);
+      await fetchSchedules();
+      setLoading(false);
+    };
+
+    if (user) {
+      loadSchedules();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  return {
+    schedules,
+    loading,
+    createSchedule,
+    updateScheduleStatus,
+    refetch: fetchSchedules,
+  };
+};
+
+export const useRealtimeHealthRecords = () => {
+  const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  const fetchHealthRecords = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('health_records')
+        .select(`
+          *,
+          ponds!inner(user_id, name)
+        `)
+        .eq('ponds.user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching health records:', error);
+        return;
+      }
+
+      setHealthRecords((data || []) as HealthRecord[]);
+    } catch (error) {
+      console.error('Error fetching health records:', error);
+    }
+  };
+
+  const createHealthRecord = async (recordData: Omit<HealthRecord, 'id' | 'created_at'>) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('health_records')
+        .insert([recordData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating health record:', error);
+        throw error;
+      }
+
+      await fetchHealthRecords();
+      return data;
+    } catch (error) {
+      console.error('Error creating health record:', error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const loadHealthRecords = async () => {
+      setLoading(true);
+      await fetchHealthRecords();
+      setLoading(false);
+    };
+
+    if (user) {
+      loadHealthRecords();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  return {
+    healthRecords,
+    loading,
+    createHealthRecord,
+    refetch: fetchHealthRecords,
+  };
+};
+
+export const useRealtimeWaterQuality = () => {
+  const [waterQualityLogs, setWaterQualityLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Mock data for now since we don't have a water quality table yet
+  useEffect(() => {
+    setWaterQualityLogs([
+      { id: 1, temperature: 28.5, ph_level: 7.2, created_at: new Date().toISOString() },
+      { id: 2, temperature: 29.1, ph_level: 7.1, created_at: new Date().toISOString() },
+    ]);
+    setLoading(false);
+  }, []);
+
+  return {
+    waterQualityLogs,
+    loading,
   };
 };
