@@ -158,12 +158,12 @@ const UserManagement = () => {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
-            <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+            <DialogHeader>
               <DialogTitle>Tambah Pengguna Baru</DialogTitle>
               <DialogDescription>
                 Masukkan informasi pengguna yang akan ditambahkan ke sistem
               </DialogDescription>
-            </div>
+            </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nama Lengkap *</Label>

@@ -235,12 +235,12 @@ const FeedRecommendations = () => {
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
-                  <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+                  <DialogHeader>
                     <DialogTitle>Tambah Jadwal Pakan</DialogTitle>
                     <DialogDescription>
                       Buat jadwal pemberian pakan baru
                     </DialogDescription>
-                  </div>
+                  </DialogHeader>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="pond">Kolam</Label>
