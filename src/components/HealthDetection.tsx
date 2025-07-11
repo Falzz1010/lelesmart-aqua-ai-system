@@ -17,21 +17,27 @@ import {
   Heart,
   Activity,
   FileImage,
-  Plus
+  Plus,
+  Bot,
+  Sparkles
 } from "lucide-react";
 import { usePonds } from "@/hooks/usePonds";
 import { useRealtimeHealthRecords } from "@/hooks/useRealtimeData";
 import { useToast } from "@/hooks/use-toast";
+import { useGeminiAI } from "@/hooks/useGeminiAI";
 
 const HealthDetection = () => {
   const { ponds } = usePonds();
   const { healthRecords, loading, createHealthRecord } = useRealtimeHealthRecords();
   const { toast } = useToast();
+  const { analyzeHealth, isLoading: aiLoading } = useGeminiAI();
   const [dragActive, setDragActive] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [aiAnalysis, setAiAnalysis] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [healthPrompt, setHealthPrompt] = useState("");
   const [newRecord, setNewRecord] = useState({
     pond_id: "",
     health_status: "healthy" as "healthy" | "sick" | "critical",
@@ -108,6 +114,32 @@ const HealthDetection = () => {
     }, 3000);
   };
 
+  const handleAIAnalysis = async () => {
+    if (!healthPrompt.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Mohon masukkan deskripsi kondisi ikan"
+      });
+      return;
+    }
+
+    try {
+      const result = await analyzeHealth(healthPrompt);
+      setAiAnalysis(result);
+      toast({
+        title: "Analisis Selesai",
+        description: "AI telah menganalisis kondisi kesehatan ikan"
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Gagal menganalisis kondisi ikan"
+      });
+    }
+  };
+
   const handleCreateRecord = async () => {
     if (!newRecord.pond_id || !newRecord.health_status) {
       toast({
@@ -177,7 +209,7 @@ const HealthDetection = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Deteksi Kesehatan Ikan AI</h2>
-          <p className="text-gray-600 mt-1">Upload foto atau video ikan untuk analisis kesehatan otomatis</p>
+          <p className="text-gray-600 mt-1">Upload foto atau deskripsikan kondisi ikan untuk analisis kesehatan otomatis</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -254,6 +286,48 @@ const HealthDetection = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* AI Text Analysis */}
+        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Bot className="h-5 w-5 text-purple-600" />
+              <span>Analisis AI Berbasis Teks</span>
+            </CardTitle>
+            <CardDescription>
+              Deskripsikan kondisi ikan untuk mendapatkan analisis AI
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="health-prompt">Deskripsi Kondisi Ikan</Label>
+              <Textarea
+                id="health-prompt"
+                value={healthPrompt}
+                onChange={(e) => setHealthPrompt(e.target.value)}
+                placeholder="Contoh: Ikan terlihat lemas, nafsu makan berkurang, ada bercak putih di tubuh..."
+                rows={4}
+              />
+            </div>
+            <Button 
+              onClick={handleAIAnalysis} 
+              disabled={aiLoading || !healthPrompt.trim()}
+              className="w-full"
+            >
+              {aiLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                  Menganalisis...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Analisis dengan AI
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Upload Section */}
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardHeader>
@@ -337,14 +411,90 @@ const HealthDetection = () => {
           </CardContent>
         </Card>
 
-        {/* Analysis Results */}
+        {/* AI Analysis Results */}
+        {aiAnalysis && (
+          <Card className="bg-white/70 backdrop-blur-sm border-purple-100/50 lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Bot className="h-5 w-5 text-purple-600" />
+                <span>Hasil Analisis AI</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {aiAnalysis.healthScore && (
+                  <div className="text-center p-3 bg-purple-50/50 rounded-lg">
+                    <Heart className="h-6 w-6 text-purple-600 mx-auto mb-1" />
+                    <p className="text-2xl font-bold text-purple-600">{aiAnalysis.healthScore}%</p>
+                    <p className="text-xs text-gray-600">Skor Kesehatan</p>
+                  </div>
+                )}
+                {aiAnalysis.confidence && (
+                  <div className="text-center p-3 bg-blue-50/50 rounded-lg">
+                    <Eye className="h-6 w-6 text-blue-600 mx-auto mb-1" />
+                    <p className="text-2xl font-bold text-blue-600">{aiAnalysis.confidence}%</p>
+                    <p className="text-xs text-gray-600">Tingkat Kepercayaan</p>
+                  </div>
+                )}
+                {aiAnalysis.status && (
+                  <div className="text-center p-3 bg-green-50/50 rounded-lg">
+                    <Activity className="h-6 w-6 text-green-600 mx-auto mb-1" />
+                    <p className="text-2xl font-bold text-green-600 capitalize">{aiAnalysis.status}</p>
+                    <p className="text-xs text-gray-600">Status</p>
+                  </div>
+                )}
+              </div>
+
+              {aiAnalysis.diagnosis && (
+                <div className="p-4 bg-blue-50/50 rounded-lg">
+                  <h4 className="font-semibold text-blue-800 mb-2">🔍 Diagnosis:</h4>
+                  <p className="text-blue-700">{aiAnalysis.diagnosis}</p>
+                </div>
+              )}
+
+              {aiAnalysis.symptoms && aiAnalysis.symptoms.length > 0 && (
+                <div className="p-4 bg-yellow-50/50 rounded-lg">
+                  <h4 className="font-semibold text-yellow-800 mb-2">⚠️ Gejala yang Terdeteksi:</h4>
+                  <ul className="text-yellow-700 space-y-1">
+                    {aiAnalysis.symptoms.map((symptom, index) => (
+                      <li key={index}>• {symptom}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {aiAnalysis.treatment && (
+                <div className="p-4 bg-green-50/50 rounded-lg">
+                  <h4 className="font-semibold text-green-800 mb-2">💊 Rekomendasi Pengobatan:</h4>
+                  <p className="text-green-700">{aiAnalysis.treatment}</p>
+                </div>
+              )}
+
+              {aiAnalysis.prevention && (
+                <div className="p-4 bg-purple-50/50 rounded-lg">
+                  <h4 className="font-semibold text-purple-800 mb-2">🛡️ Tips Pencegahan:</h4>
+                  <p className="text-purple-700">{aiAnalysis.prevention}</p>
+                </div>
+              )}
+
+              {aiAnalysis.analysis && (
+                <div className="p-4 bg-gray-50/50 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">📋 Analisis Lengkap:</h4>
+                  <p className="text-gray-700 whitespace-pre-wrap">{aiAnalysis.analysis}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Image Analysis Results */}
         {analysisResult && (
           <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Activity className="h-5 w-5 text-green-600" />
-                  <span>Hasil Analisis</span>
+                  <span>Hasil Analisis Gambar</span>
                 </div>
                 <Badge className={`${getHealthBadge(analysisResult.status)} text-white`}>
                   Skor: {analysisResult.healthScore}%

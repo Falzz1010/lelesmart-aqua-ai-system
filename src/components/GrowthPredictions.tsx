@@ -1,9 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge"; 
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { 
   TrendingUp, 
   Calendar, 
@@ -11,16 +12,24 @@ import {
   Target,
   BarChart3,
   Zap,
-  AlertCircle
+  AlertCircle,
+  Bot,
+  Sparkles
 } from "lucide-react";
 import { usePonds } from "@/hooks/usePonds";
 import { useRealtimeFeedingSchedules, useRealtimeHealthRecords } from "@/hooks/useRealtimeData";
+import { useToast } from "@/hooks/use-toast";
+import { useGeminiAI } from "@/hooks/useGeminiAI";
 
 const GrowthPredictions = () => {
   const { ponds } = usePonds();
   const { schedules } = useRealtimeFeedingSchedules();
   const { healthRecords } = useRealtimeHealthRecords();
+  const { predictGrowth, isLoading: aiLoading } = useGeminiAI();
+  const { toast } = useToast();
   const [predictions, setPredictions] = useState([]);
+  const [aiPrediction, setAiPrediction] = useState(null);
+  const [growthPrompt, setGrowthPrompt] = useState("");
 
   useEffect(() => {
     // Calculate predictions based on real data
@@ -94,6 +103,52 @@ const GrowthPredictions = () => {
     return recommendations;
   };
 
+  const handleAIPrediction = async () => {
+    if (!growthPrompt.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Mohon masukkan data kolam untuk prediksi"
+      });
+      return;
+    }
+
+    // Prepare context with pond data
+    const contextData = ponds.map(pond => ({
+      name: pond.name,
+      size: pond.size_m2,
+      fishCount: pond.fish_count,
+      fishAge: pond.fish_age_days,
+      waterTemp: pond.water_temperature,
+      phLevel: pond.ph_level
+    }));
+
+    const fullPrompt = `
+Data Kolam:
+${JSON.stringify(contextData, null, 2)}
+
+Informasi Tambahan:
+${growthPrompt}
+
+Berikan prediksi pertumbuhan dan rekomendasi panen berdasarkan data di atas.
+    `;
+
+    try {
+      const result = await predictGrowth(fullPrompt);
+      setAiPrediction(result);
+      toast({
+        title: "Prediksi Selesai",
+        description: "AI telah menganalisis data dan memberikan prediksi pertumbuhan"
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Gagal mendapatkan prediksi dari AI"
+      });
+    }
+  };
+
   const growthMetrics = {
     avgGrowthRate: predictions.length > 0 
       ? predictions.reduce((sum, p) => sum + (p.currentAge * 0.5), 0) / predictions.length 
@@ -133,6 +188,105 @@ const GrowthPredictions = () => {
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Prediksi Panen & Pertumbuhan</h2>
         <p className="text-gray-600 mt-1 text-sm sm:text-base">Analisis AI untuk estimasi hasil panen dan strategi optimal</p>
       </div>
+
+      {/* AI Prediction Section */}
+      <Card className="bg-white/70 backdrop-blur-sm border-purple-100/50">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Bot className="h-5 w-5 text-purple-600" />
+            <span>Konsultasi AI untuk Prediksi Pertumbuhan</span>
+          </CardTitle>
+          <CardDescription>
+            Dapatkan analisis mendalam dan rekomendasi dari AI berdasarkan data kolam Anda
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="growth-prompt">Informasi Tambahan (Opsional)</Label>
+            <Textarea
+              id="growth-prompt"
+              value={growthPrompt}
+              onChange={(e) => setGrowthPrompt(e.target.value)}
+              placeholder="Contoh: Target panen dalam 2 bulan, harga pakan naik, kondisi cuaca tidak menentu..."
+              rows={3}
+            />
+          </div>
+          <Button 
+            onClick={handleAIPrediction} 
+            disabled={aiLoading}
+            className="w-full"
+          >
+            {aiLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                Menganalisis...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Dapatkan Prediksi AI
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* AI Prediction Results */}
+      {aiPrediction && (
+        <Card className="bg-white/70 backdrop-blur-sm border-purple-100/50">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Bot className="h-5 w-5 text-purple-600" />
+              <span>Hasil Prediksi AI</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {aiPrediction.growthRate && (
+                <div className="p-4 bg-blue-50/50 rounded-lg">
+                  <h4 className="font-semibold text-blue-800 mb-2">📈 Tingkat Pertumbuhan:</h4>
+                  <p className="text-blue-700 capitalize font-medium">{aiPrediction.growthRate}</p>
+                </div>
+              )}
+              
+              {aiPrediction.harvestRecommendation && (
+                <div className="p-4 bg-green-50/50 rounded-lg">
+                  <h4 className="font-semibold text-green-800 mb-2">🎯 Rekomendasi Panen:</h4>
+                  <p className="text-green-700">{aiPrediction.harvestRecommendation}</p>
+                </div>
+              )}
+
+              {aiPrediction.feedingStrategy && (
+                <div className="p-4 bg-orange-50/50 rounded-lg">
+                  <h4 className="font-semibold text-orange-800 mb-2">🍽️ Strategi Pakan:</h4>
+                  <p className="text-orange-700">{aiPrediction.feedingStrategy}</p>
+                </div>
+              )}
+
+              {aiPrediction.expectedYield && (
+                <div className="p-4 bg-purple-50/50 rounded-lg">
+                  <h4 className="font-semibold text-purple-800 mb-2">⚖️ Prediksi Hasil:</h4>
+                  <p className="text-purple-700">{aiPrediction.expectedYield}</p>0
+                </div>
+              )}
+
+              {aiPrediction.marketTiming && (
+                <div className="p-4 bg-teal-50/50 rounded-lg">
+                  <h4 className="font-semibold text-teal-800 mb-2">📊 Timing Pasar:</h4>
+                  <p className="text-teal-700">{aiPrediction.marketTiming}</p>
+                </div>
+              )}
+
+              {aiPrediction.profitEstimate && (
+                <div className="p-4 bg-yellow-50/50 rounded-lg">
+                  <h4 className="font-semibold text-yellow-800 mb-2">💰 Estimasi Profit:</h4>
+                  <p className="text-yellow-700">{aiPrediction.profitEstimate}</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
