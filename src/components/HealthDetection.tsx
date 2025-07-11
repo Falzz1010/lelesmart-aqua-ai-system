@@ -31,7 +31,7 @@ const HealthDetection = () => {
   const { toast } = useToast();
   
   const [selectedPond, setSelectedPond] = useState("");
-  const [healthStatus, setHealthStatus] = useState("");
+  const [healthStatus, setHealthStatus] = useState<"healthy" | "sick" | "critical" | "">("");
   const [symptoms, setSymptoms] = useState("");
   const [treatment, setTreatment] = useState("");
   const [aiAnalysis, setAiAnalysis] = useState(null);
@@ -50,7 +50,7 @@ const HealthDetection = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!selectedPond || !healthStatus) {
+    if (!selectedPond || !healthStatus || healthStatus === "") {
       toast({
         variant: "destructive",
         title: "Error",
@@ -62,7 +62,7 @@ const HealthDetection = () => {
     try {
       await createHealthRecord({
         pond_id: selectedPond,
-        health_status: healthStatus,
+        health_status: healthStatus as "healthy" | "sick" | "critical",
         symptoms: symptoms || null,
         treatment: treatment || null
       });
@@ -391,7 +391,7 @@ Berdasarkan data real-time di atas, berikan analisis kesehatan ikan lele yang sp
 
               <div className="space-y-2">
                 <Label htmlFor="health-status">Status Kesehatan</Label>
-                <Select value={healthStatus} onValueChange={setHealthStatus}>
+                <Select value={healthStatus} onValueChange={(value: "healthy" | "sick" | "critical") => setHealthStatus(value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih status" />
                   </SelectTrigger>
