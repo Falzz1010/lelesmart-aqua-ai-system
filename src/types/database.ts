@@ -23,6 +23,10 @@ export interface FeedingSchedule {
   feed_type: string;
   status: 'pending' | 'completed';
   created_at: string;
+  ponds?: {
+    user_id: string;
+    name: string;
+  };
 }
 
 export interface HealthRecord {
@@ -32,7 +36,13 @@ export interface HealthRecord {
   symptoms?: string;
   treatment?: string;
   created_at: string;
+  ponds?: {
+    user_id: string;
+    name: string;
+  };
 }
 
 export type PondInsert = Omit<Pond, 'id' | 'created_at' | 'updated_at'>;
 export type PondUpdate = Partial<Omit<Pond, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
+export type FeedingScheduleInsert = Omit<FeedingSchedule, 'id' | 'created_at'>;
+export type HealthRecordInsert = Omit<HealthRecord, 'id' | 'created_at'>;

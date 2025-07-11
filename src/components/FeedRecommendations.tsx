@@ -32,7 +32,8 @@ const FeedRecommendations = () => {
     pond_id: "",
     feeding_time: "",
     feed_amount_kg: 0,
-    feed_type: "Pelet Apung"
+    feed_type: "Pelet Apung",
+    status: "pending" as "pending" | "completed"
   });
 
   const filteredSchedules = selectedPond === "all" 
@@ -61,13 +62,20 @@ const FeedRecommendations = () => {
     }
 
     try {
-      await createSchedule(newSchedule);
+      await createSchedule({
+        pond_id: newSchedule.pond_id,
+        feeding_time: newSchedule.feeding_time,
+        feed_amount_kg: newSchedule.feed_amount_kg,
+        feed_type: newSchedule.feed_type,
+        status: newSchedule.status
+      });
       setIsDialogOpen(false);
       setNewSchedule({
         pond_id: "",
         feeding_time: "",
         feed_amount_kg: 0,
-        feed_type: "Pelet Apung"
+        feed_type: "Pelet Apung",
+        status: "pending"
       });
       toast({
         title: "Berhasil",

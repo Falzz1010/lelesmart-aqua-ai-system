@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import type { FeedingSchedule, HealthRecord } from '@/types/database';
+import type { FeedingSchedule, HealthRecord, FeedingScheduleInsert, HealthRecordInsert } from '@/types/database';
 
 export const useRealtimeData = () => {
   const [feedingSchedules, setFeedingSchedules] = useState<FeedingSchedule[]>([]);
@@ -159,7 +158,7 @@ export const useRealtimeFeedingSchedules = () => {
     }
   };
 
-  const createSchedule = async (scheduleData: Omit<FeedingSchedule, 'id' | 'created_at'>) => {
+  const createSchedule = async (scheduleData: FeedingScheduleInsert) => {
     if (!user) return;
 
     try {
@@ -253,7 +252,7 @@ export const useRealtimeHealthRecords = () => {
     }
   };
 
-  const createHealthRecord = async (recordData: Omit<HealthRecord, 'id' | 'created_at'>) => {
+  const createHealthRecord = async (recordData: HealthRecordInsert) => {
     if (!user) return;
 
     try {
