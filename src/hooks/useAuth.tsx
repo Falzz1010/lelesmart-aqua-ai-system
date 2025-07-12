@@ -52,6 +52,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
+    // Determine role based on email
+    const role = email === 'admin@gmail.com' ? 'admin' : 'farmer';
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -59,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
-          role: 'farmer'
+          role: role
         }
       }
     });
@@ -91,6 +94,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         variant: "destructive",
         title: "Error Login",
         description: error.message
+      });
+    } else {
+      const role = email === 'admin@gmail.com' ? 'Admin' : 'Peternak';
+      toast({
+        title: "Login Berhasil",
+        description: `Selamat datang, ${role}!`
       });
     }
 
