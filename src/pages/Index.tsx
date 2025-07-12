@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import DashboardStats from "@/components/DashboardStats";
@@ -42,8 +43,8 @@ const Index = () => {
       case "system":
         return isAdmin ? (
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Pengaturan Sistem</h2>
-            <p className="text-gray-600">Fitur pengaturan sistem akan segera hadir.</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Pengaturan Sistem</h2>
+            <p className="text-gray-600 dark:text-gray-300">Fitur pengaturan sistem akan segera hadir.</p>
           </div>
         ) : <DashboardStats />;
       default:
@@ -53,10 +54,10 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
         </div>
       </div>
     );
@@ -65,8 +66,8 @@ const Index = () => {
   const isAdmin = profile?.role === 'admin';
   const SidebarComponent = isAdmin ? AdminSidebar : AppSidebar;
   const bgGradient = isAdmin 
-    ? "bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50"
-    : "bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50";
+    ? "bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20"
+    : "bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 dark:from-blue-900/20 dark:via-cyan-900/20 dark:to-teal-900/20";
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -75,14 +76,22 @@ const Index = () => {
         
         <SidebarInset className="flex-1 flex flex-col min-w-0">
           {/* Mobile Header */}
-          <header className={`sticky top-0 z-40 border-b ${isAdmin ? 'border-red-100/50 bg-red-50/95' : 'border-blue-100/50 bg-white/95'} backdrop-blur-md lg:hidden`}>
-            <div className="flex h-12 sm:h-14 items-center px-3 sm:px-4">
-              <SidebarTrigger className="mr-2" />
-              <h1 className="font-semibold text-sm sm:text-base truncate">
-                {isAdmin ? 'LeleSmart Admin' : 'LeleSmart'}
-              </h1>
+          <header className={`sticky top-0 z-40 border-b ${isAdmin ? 'border-red-100/50 bg-red-50/95 dark:border-red-800/50 dark:bg-red-900/95' : 'border-blue-100/50 bg-white/95 dark:border-blue-800/50 dark:bg-gray-900/95'} backdrop-blur-md lg:hidden`}>
+            <div className="flex h-12 sm:h-14 items-center justify-between px-3 sm:px-4">
+              <div className="flex items-center">
+                <SidebarTrigger className="mr-2" />
+                <h1 className="font-semibold text-sm sm:text-base truncate">
+                  {isAdmin ? 'LeleSmart Admin' : 'LeleSmart'}
+                </h1>
+              </div>
+              <ThemeToggle />
             </div>
           </header>
+
+          {/* Desktop Header */}
+          <div className="hidden lg:flex justify-end p-4">
+            <ThemeToggle />
+          </div>
 
           {/* Main Content */}
           <main className="flex-1 p-3 sm:p-4 lg:p-6 xl:p-8 overflow-hidden">

@@ -39,13 +39,14 @@ export const useProfile = (user: User | null) => {
         if (error) {
           console.error('Error fetching profile:', error);
           // If profile doesn't exist, create one
+          const role = user.email === 'admin@gmail.com' ? 'admin' : 'farmer';
           const { data: newProfile, error: createError } = await supabase
             .from('profiles')
             .insert({
               id: user.id,
               email: user.email || '',
               full_name: user.user_metadata?.full_name || user.email || 'User',
-              role: user.email === 'admin@gmail.com' ? 'admin' : 'farmer'
+              role: role
             })
             .select()
             .single();

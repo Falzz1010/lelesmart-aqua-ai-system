@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Fish } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -23,6 +24,12 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate password length
+    if (password.length < 6) {
+      return;
+    }
+
     setLoading(true);
 
     if (isLogin) {
@@ -35,8 +42,12 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm border-blue-100/50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+      
+      <Card className="w-full max-w-md bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-blue-100/50 dark:border-gray-700/50">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center">
@@ -89,11 +100,14 @@ const Auth = () => {
                 placeholder="Password"
                 minLength={6}
               />
+              {password.length > 0 && password.length < 6 && (
+                <p className="text-sm text-red-500">Password minimal 6 karakter</p>
+              )}
             </div>
             
             <Button 
               type="submit" 
-              disabled={loading}
+              disabled={loading || password.length < 6}
               className="w-full bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600"
             >
               {loading ? 'Loading...' : (isLogin ? 'Masuk' : 'Daftar')}
@@ -104,7 +118,7 @@ const Auth = () => {
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-blue-600 hover:underline dark:text-blue-400"
             >
               {isLogin 
                 ? 'Belum punya akun? Daftar di sini' 
