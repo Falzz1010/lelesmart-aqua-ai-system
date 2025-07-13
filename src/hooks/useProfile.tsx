@@ -30,6 +30,8 @@ export const useProfile = (user: User | null) => {
 
     const fetchProfile = async () => {
       try {
+        console.log('Fetching profile for user:', user.email);
+        
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -37,9 +39,12 @@ export const useProfile = (user: User | null) => {
           .single();
 
         if (error) {
-          console.error('Error fetching profile:', error);
+          console.error('Profile fetch error:', error);
+          
           // If profile doesn't exist, create one
-          const role = user.email === 'admin@gmail.com' ? 'admin' : 'farmer';
+          const role = (user.email === 'admin@gmail.com' || user.email === 'admin@lelesmart.com') ? 'admin' : 'farmer';
+          console.log('Creating profile for:', user.email, 'with role:', role);
+          
           const { data: newProfile, error: createError } = await supabase
             .from('profiles')
             .insert({
@@ -59,9 +64,11 @@ export const useProfile = (user: User | null) => {
               description: "Gagal membuat profil pengguna"
             });
           } else {
+            console.log('Profile created successfully:', newProfile);
             setProfile(newProfile as Profile);
           }
         } else {
+          console.log('Profile loaded successfully:', data);
           setProfile(data as Profile);
         }
       } catch (err) {

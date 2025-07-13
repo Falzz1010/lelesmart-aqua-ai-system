@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -41,6 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session:', session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -52,8 +54,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    // Determine role based on email
-    const role = email === 'admin@gmail.com' ? 'admin' : 'farmer';
+    // Determine role based on email - admin bisa login dengan email admin@gmail.com atau admin@lelesmart.com
+    const role = (email === 'admin@gmail.com' || email === 'admin@lelesmart.com') ? 'admin' : 'farmer';
+    
+    console.log('Signing up user:', email, 'with role:', role);
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -68,6 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (error) {
+      console.error('Sign up error:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -84,19 +89,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
+    console.log('Attempting to sign in:', email);
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
     if (error) {
+      console.error('Sign in error:', error);
       toast({
         variant: "destructive",
         title: "Error Login",
-        description: error.message
+        description: error.message === 'Invalid login credentials' ? 
+          'Email atau password salah' : error.message
       });
     } else {
-      const role = email === 'admin@gmail.com' ? 'Admin' : 'Peternak';
+      // Determine role for welcome message
+      const role = (email === 'admin@gmail.com' || email === 'admin@lelesmart.com') ? 'Admin' : 'Peternak';
+      console.log('Login successful for:', email, 'as:', role);
+      
       toast({
         title: "Login Berhasil",
         description: `Selamat datang, ${role}!`
@@ -107,6 +119,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    console.log('Signing out user');
     await supabase.auth.signOut();
     toast({
       title: "Berhasil Logout",
