@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Fish, Eye, EyeOff, Shield, User } from 'lucide-react';
+import { Fish, Eye, EyeOff, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -42,18 +42,6 @@ const Auth = () => {
     setLoading(false);
   };
 
-  const handleAdminLogin = () => {
-    setEmail('admin@gmail.com');
-    setPassword('admin123');
-    setIsLogin(true);
-  };
-
-  const handleDemoLogin = () => {
-    setEmail('demo@lelesmart.com');
-    setPassword('demo123');
-    setIsLogin(true);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex items-center justify-center p-3 sm:p-4">
       <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
@@ -76,42 +64,6 @@ const Auth = () => {
         </CardHeader>
         
         <CardContent className="space-y-4 sm:space-y-6">
-          {/* Demo Login Buttons */}
-          <div className="space-y-2">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleAdminLogin}
-                className="flex-1 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-950 dark:border-red-800 dark:text-red-300 text-xs sm:text-sm py-2"
-              >
-                <Shield className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                Login Admin
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleDemoLogin}
-                className="flex-1 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-300 text-xs sm:text-sm py-2"
-              >
-                <User className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                Demo User
-              </Button>
-            </div>
-            <p className="text-xs text-gray-500 text-center">
-              Atau masuk dengan akun Anda sendiri
-            </p>
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-200 dark:border-gray-700" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white dark:bg-gray-900 px-2 text-gray-500">atau</span>
-            </div>
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div className="space-y-2">
@@ -136,7 +88,7 @@ const Auth = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="user@example.com"
+                placeholder="Masukkan email Anda"
                 className="h-10 sm:h-11"
               />
             </div>
@@ -150,7 +102,7 @@ const Auth = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="Password"
+                  placeholder="Masukkan password"
                   minLength={6}
                   className="h-10 sm:h-11 pr-10"
                 />
@@ -196,13 +148,29 @@ const Auth = () => {
             </button>
           </div>
 
-          {/* Admin Login Info */}
-          <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950/30 dark:to-orange-950/30 p-3 rounded-lg border border-red-100 dark:border-red-800/30">
-            <h4 className="text-xs font-semibold text-red-800 dark:text-red-300 mb-1">Info Admin:</h4>
-            <p className="text-xs text-red-600 dark:text-red-400">
-              Email: admin@gmail.com<br />
-              Password: admin123
-            </p>
+          {/* Login Instructions */}
+          <div className="space-y-3">
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950/30 dark:to-orange-950/30 p-3 rounded-lg border border-red-100 dark:border-red-800/30">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <h4 className="text-sm font-semibold text-red-800 dark:text-red-300">Admin Login</h4>
+              </div>
+              <p className="text-xs text-red-600 dark:text-red-400">
+                Email: admin@gmail.com atau admin@lelesmart.com<br />
+                Password: admin123
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 p-3 rounded-lg border border-blue-100 dark:border-blue-800/30">
+              <div className="flex items-center gap-2 mb-2">
+                <Fish className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300">Peternak Login</h4>
+              </div>
+              <p className="text-xs text-blue-600 dark:text-blue-400">
+                Gunakan email dan password yang telah didaftarkan<br />
+                atau buat akun baru dengan klik "Daftar di sini"
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

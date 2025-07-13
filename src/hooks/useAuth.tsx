@@ -51,11 +51,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const isAdminEmail = (email: string) => {
+    return email === 'admin@gmail.com' || email === 'admin@lelesmart.com';
+  };
+
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    // Determine role based on email - admin bisa login dengan email admin@gmail.com atau admin@lelesmart.com
-    const role = (email === 'admin@gmail.com' || email === 'admin@lelesmart.com') ? 'admin' : 'farmer';
+    // Determine role based on email
+    const role = isAdminEmail(email) ? 'admin' : 'farmer';
     
     console.log('Signing up user:', email, 'with role:', role);
     
@@ -73,10 +77,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) {
       console.error('Sign up error:', error);
+      let errorMessage = error.message;
+      
+      // Provide more user-friendly error messages
+      if (error.message.includes('User already registered')) {
+        errorMessage = 'Email sudah terdaftar. Silakan gunakan email lain atau login.';
+      } else if (error.message.includes('Password should be at least')) {
+        errorMessage = 'Password harus minimal 6 karakter.';
+      } else if (error.message.includes('Invalid email')) {
+        errorMessage = 'Format email tidak valid.';
+      }
+      
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message
+        title: "Error Pendaftaran",
+        description: errorMessage
       });
     } else {
       toast({
@@ -98,20 +113,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) {
       console.error('Sign in error:', error);
+      let errorMessage = error.message;
+      
+      // Provide more user-friendly error messages
+      if (error.message === 'Invalid login credentials') {
+        errorMessage = 'Email atau password salah. Periksa kembali data login Anda.';
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = 'Email belum diverifikasi. Silakan cek email Anda untuk konfirmasi.';
+      } else if (error.message.includes('Too many requests')) {
+        errorMessage = 'Terlalu banyak percobaan login. Silakan coba lagi nanti.';
+      }
+      
       toast({
         variant: "destructive",
         title: "Error Login",
-        description: error.message === 'Invalid login credentials' ? 
-          'Email atau password salah' : error.message
+        description: errorMessage
       });
     } else {
-      // Determine role for welcome message
-      const role = (email === 'admin@gmail.com' || email === 'admin@lelesmart.com') ? 'Admin' : 'Peternak';
-      console.log('Login successful for:', email, 'as:', role);
+      // Determine user type for welcome message
+      const userType = isAdminEmail(email) ? 'Administrator' : 'Peternak';
+      console.log('Login successful for:', email, 'as:', userType);
       
       toast({
         title: "Login Berhasil",
-        description: `Selamat datang, ${role}!`
+        description: `Selamat datang, ${userType}!`
       });
     }
 
