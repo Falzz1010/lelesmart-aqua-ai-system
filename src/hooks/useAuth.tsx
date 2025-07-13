@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     console.log('Attempting to sign in:', email);
     
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         title: "Error Login",
         description: errorMessage
       });
-    } else {
+    } else if (data.user) {
       // Determine user type for welcome message
       const userType = isAdminEmail(email) ? 'Administrator' : 'Peternak';
       console.log('Login successful for:', email, 'as:', userType);
@@ -145,11 +145,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     console.log('Signing out user');
-    await supabase.auth.signOut();
-    toast({
-      title: "Berhasil Logout",
-      description: "Sampai jumpa lagi!"
-    });
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      console.error('Sign out error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Gagal logout"
+      });
+    } else {
+      toast({
+        title: "Berhasil Logout",
+        description: "Sampai jumpa lagi!"
+      });
+    }
   };
 
   const value = {

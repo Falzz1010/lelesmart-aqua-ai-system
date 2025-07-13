@@ -42,7 +42,9 @@ export const useProfile = (user: User | null) => {
           console.error('Profile fetch error:', error);
           
           // If profile doesn't exist, create one
-          const role = (user.email === 'admin@gmail.com' || user.email === 'admin@lelesmart.com') ? 'admin' : 'farmer';
+          const isAdminEmail = user.email === 'admin@gmail.com' || user.email === 'admin@lelesmart.com';
+          const role = isAdminEmail ? 'admin' : 'farmer';
+          
           console.log('Creating profile for:', user.email, 'with role:', role);
           
           const { data: newProfile, error: createError } = await supabase
@@ -51,7 +53,7 @@ export const useProfile = (user: User | null) => {
               id: user.id,
               email: user.email || '',
               full_name: user.user_metadata?.full_name || user.email || 'User',
-              role: role as any // Cast to any to bypass TypeScript error until types are regenerated
+              role: role
             })
             .select()
             .single();
@@ -66,6 +68,10 @@ export const useProfile = (user: User | null) => {
           } else {
             console.log('Profile created successfully:', newProfile);
             setProfile(newProfile as Profile);
+            toast({
+              title: "Berhasil",
+              description: "Profil berhasil dibuat"
+            });
           }
         } else {
           console.log('Profile loaded successfully:', data);
@@ -73,12 +79,41 @@ export const useProfile = (user: User | null) => {
         }
       } catch (err) {
         console.error('Unexpected error:', err);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Terjadi kesalahan tak terduga"
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfile();
+
+    // Set up realtime subscription for profile changes
+    const channel = supabase
+      .channel('profile_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Profile realtime change:', payload);
+          if (payload.eventType === 'UPDATE') {
+            setProfile(payload.new as Profile);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user, toast]);
 
   return { profile, loading };
