@@ -59,10 +59,10 @@ export const useProfile = (user: User | null) => {
               description: "Gagal membuat profil pengguna"
             });
           } else {
-            setProfile(newProfile);
+            setProfile(newProfile as Profile);
           }
         } else {
-          setProfile(data);
+          setProfile(data as Profile);
         }
       } catch (err) {
         console.error('Unexpected error:', err);
