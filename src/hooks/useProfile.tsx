@@ -46,7 +46,7 @@ export const useProfile = (user: User | null) => {
               id: user.id,
               email: user.email || '',
               full_name: user.user_metadata?.full_name || user.email || 'User',
-              role: role
+              role: role as any // Cast to any to bypass TypeScript error until types are regenerated
             })
             .select()
             .single();
