@@ -217,7 +217,7 @@ const FeedRecommendations = () => {
 
       {/* Feeding Schedule */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -312,7 +312,7 @@ const FeedRecommendations = () => {
               </div>
             ) : (
               todaySchedules.map((schedule) => (
-                <div key={schedule.id} className="p-4 bg-white/50 rounded-lg border border-blue-100/30">
+                <div key={schedule.id} className="p-4 bg-card/40 rounded-lg border border-border/30">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       <div className="flex items-center space-x-2">
@@ -358,7 +358,7 @@ const FeedRecommendations = () => {
 
         <div className="space-y-6">
           {/* Weekly Performance */}
-          <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+          <Card className="bg-card/70 backdrop-blur-sm border-border/50">
             <CardHeader>
               <CardTitle>Performa Mingguan</CardTitle>
               <CardDescription>Efisiensi pemberian pakan 7 hari terakhir</CardDescription>
@@ -395,7 +395,7 @@ const FeedRecommendations = () => {
           </Card>
 
           {/* AI Insights */}
-          <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+          <Card className="bg-card/70 backdrop-blur-sm border-border/50">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Zap className="h-5 w-5 text-yellow-600" />

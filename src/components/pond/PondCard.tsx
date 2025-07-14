@@ -14,9 +14,9 @@ interface PondCardProps {
 export const PondCard = ({ pond, onEdit, onDelete }: PondCardProps) => {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      active: { label: 'Aktif', variant: 'default' as const, className: 'bg-green-100 text-green-800' },
-      maintenance: { label: 'Maintenance', variant: 'secondary' as const, className: 'bg-yellow-100 text-yellow-800' },
-      inactive: { label: 'Tidak Aktif', variant: 'destructive' as const, className: 'bg-red-100 text-red-800' },
+      active: { label: 'Aktif', variant: 'default' as const, className: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' },
+      maintenance: { label: 'Maintenance', variant: 'secondary' as const, className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' },
+      inactive: { label: 'Tidak Aktif', variant: 'destructive' as const, className: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' },
     };
     
     return statusConfig[status as keyof typeof statusConfig] || statusConfig.active;

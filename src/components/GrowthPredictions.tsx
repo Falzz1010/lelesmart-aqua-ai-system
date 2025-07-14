@@ -262,7 +262,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
       </div>
 
       {/* AI Prediction Section */}
-      <Card className="bg-white/70 backdrop-blur-sm border-purple-100/50">
+      <Card className="bg-card/70 backdrop-blur-sm border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Bot className="h-5 w-5 text-purple-600" />
@@ -308,7 +308,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
 
       {/* AI Prediction Results */}
       {aiPrediction && (
-        <Card className="bg-white/70 backdrop-blur-sm border-purple-100/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Bot className="h-5 w-5 text-purple-600" />
@@ -365,7 +365,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
 
       {/* Key Metrics - Real Data */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
@@ -381,7 +381,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
@@ -397,7 +397,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
@@ -413,7 +413,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
@@ -432,7 +432,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
 
       {/* Harvest Predictions */}
       {predictions.length === 0 ? (
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardContent className="text-center py-8 sm:py-12 px-4">
             <Fish className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-base sm:text-lg font-semibold text-muted-foreground mb-2">Belum Ada Data Kolam</h3>
@@ -442,7 +442,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {predictions.map((prediction, index) => (
-            <Card key={index} className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+            <Card key={index} className="bg-card/70 backdrop-blur-sm border-border/50">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base sm:text-lg truncate">{prediction.pond}</CardTitle>
@@ -508,7 +508,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
 
       {/* Market Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
               <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
@@ -560,7 +560,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
               <Fish className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
