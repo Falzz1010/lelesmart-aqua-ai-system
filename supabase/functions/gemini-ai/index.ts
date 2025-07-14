@@ -17,7 +17,7 @@ serve(async (req) => {
   try {
     const { prompt, context, conversation_history } = await req.json();
 
-    let systemPrompt = 'Anda adalah AI Assistant ahli budidaya ikan lele yang memberikan konsultasi dan analisis praktis. Berikan jawaban yang informatif, praktis, dan mudah dipahami. PENTING: Jangan gunakan simbol markdown seperti *, #, **, atau simbol format lainnya dalam jawaban. Berikan respons dalam teks biasa yang rapi dan terstruktur.';
+    let systemPrompt = 'Anda adalah AI Assistant ahli budidaya ikan lele yang memberikan konsultasi dan analisis praktis. Berikan jawaban yang informatif, praktis, dan mudah dipahami. PENTING: JANGAN PERNAH gunakan simbol markdown seperti *, **, #, ##, ###, `, ```, -, atau simbol format lainnya dalam jawaban. Berikan respons dalam teks biasa yang rapi dan terstruktur tanpa format markdown apapun. Gunakan kata-kata biasa untuk penekanan, bukan simbol.';
     
     if (context === 'pond_analysis') {
       systemPrompt += ' Fokus pada analisis kondisi kolam dan berikan rekomendasi berdasarkan data yang diberikan.';
@@ -64,15 +64,20 @@ serve(async (req) => {
     const data = await response.json();
     let generatedText = data.candidates[0].content.parts[0].text;
 
-    // Clean markdown symbols and formatting
+    // Aggressive markdown cleaning
     generatedText = generatedText
-      .replace(/\*\*/g, '') // Remove bold
-      .replace(/\*/g, '') // Remove italic
-      .replace(/#{1,6}\s?/g, '') // Remove headers
-      .replace(/`/g, '') // Remove code blocks
+      .replace(/\*\*\*([^*]+)\*\*\*/g, '$1') // Remove triple asterisks
+      .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold 
+      .replace(/\*([^*]+)\*/g, '$1') // Remove italic
+      .replace(/#{1,6}\s*/g, '') // Remove all headers
+      .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+      .replace(/`([^`]+)`/g, '$1') // Remove inline code
       .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links, keep text
-      .replace(/^\s*[-*+]\s+/gm, '• ') // Convert list items to bullet points
-      .replace(/^\s*\d+\.\s+/gm, '') // Remove numbered list formatting
+      .replace(/^\s*[-*+•]\s+/gm, '') // Remove all bullet points
+      .replace(/^\s*\d+\.\s+/gm, '') // Remove numbered lists
+      .replace(/[-_]{2,}/g, '') // Remove horizontal lines
+      .replace(/[*_#`~\[\]()]/g, '') // Remove remaining markdown symbols
+      .replace(/\s+/g, ' ') // Normalize whitespace
       .trim();
 
     return new Response(JSON.stringify({ 
