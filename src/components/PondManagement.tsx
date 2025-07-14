@@ -154,77 +154,101 @@ const PondManagement = () => {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Input
-            type="search"
-            placeholder="Cari kolam..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="sm:w-64 h-9 sm:h-10 text-sm"
-          />
-          <Button variant="outline" size="sm">
-            <Search className="h-4 w-4 mr-2" />
-            Cari
-          </Button>
+      <div className="space-y-4">
+        {/* Search bar - full width on mobile */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Cari kolam..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-10"
+              />
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive" | "maintenance") => setStatusFilter(value)}>
+              <SelectTrigger className="h-10 w-full sm:w-[140px]">
+                <SelectValue placeholder="Semua Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="active">Aktif</SelectItem>
+                <SelectItem value="inactive">Tidak Aktif</SelectItem>
+                <SelectItem value="maintenance">Maintenance</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive" | "maintenance") => setStatusFilter(value)}>
-            <SelectTrigger className="h-9 sm:h-10 text-sm">
-              <SelectValue placeholder="Semua Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="active">Aktif</SelectItem>
-              <SelectItem value="inactive">Tidak Aktif</SelectItem>
-              <SelectItem value="maintenance">Maintenance</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant={viewMode === 'grid' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('grid')}
-          >
-            <Grid3X3 className="h-4 w-4 mr-2" />
-            Grid
-          </Button>
-          <Button
-            variant={viewMode === 'list' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('list')}
-          >
-            <List className="h-4 w-4 mr-2" />
-            List
-          </Button>
+        {/* View toggle - centered on mobile */}
+        <div className="flex justify-center sm:justify-end">
+          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className={`h-8 px-3 ${viewMode === 'grid' ? 'bg-background shadow-sm' : ''}`}
+            >
+              <Grid3X3 className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Grid</span>
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('list')}
+              className={`h-8 px-3 ${viewMode === 'list' ? 'bg-background shadow-sm' : ''}`}
+            >
+              <List className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">List</span>
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Pond List/Grid */}
-      <div className={`grid gap-4 sm:gap-6 ${
-        viewMode === 'grid' 
-          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
-          : 'grid-cols-1'
-      }`}>
-        {filteredPonds.map((pond) => (
-          <PondCard
-            key={pond.id}
-            pond={pond}
-            onEdit={(pond) => {
-              setEditingPond(pond);
-              setIsFormOpen(true);
-            }}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+      {/* Empty state or Pond List/Grid */}
+      {filteredPonds.length === 0 ? (
+        <div className="text-center py-12">
+          <Fish className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">
+            {ponds.length === 0 ? 'Belum ada kolam' : 'Tidak ada kolam yang sesuai'}
+          </h3>
+          <p className="text-muted-foreground mb-4">
+            {ponds.length === 0 
+              ? 'Mulai dengan menambahkan kolam pertama Anda'
+              : 'Coba ubah filter pencarian Anda'
+            }
+          </p>
+          {ponds.length === 0 && (
+            <Button onClick={() => setIsFormOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Kolam Pertama
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className={`grid gap-4 ${
+          viewMode === 'grid' 
+            ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' 
+            : 'grid-cols-1 max-w-4xl mx-auto'
+        }`}>
+          {filteredPonds.map((pond) => (
+            <PondCard
+              key={pond.id}
+              pond={pond}
+              onEdit={(pond) => {
+                setEditingPond(pond);
+                setIsFormOpen(true);
+              }}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Pond Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={(open) => {

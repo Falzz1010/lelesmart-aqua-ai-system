@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Droplets, Fish, Calendar, Thermometer, Trash2, Edit } from "lucide-react";
+import { Droplets, Fish, Calendar, Thermometer, Trash2, Edit, Waves } from "lucide-react";
 import type { Pond } from "@/types/database";
 
 interface PondCardProps {
@@ -12,78 +12,147 @@ interface PondCardProps {
 }
 
 export const PondCard = ({ pond, onEdit, onDelete }: PondCardProps) => {
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      active: { label: 'Aktif', variant: 'default' as const, className: 'bg-green-100 text-green-800' },
-      maintenance: { label: 'Maintenance', variant: 'secondary' as const, className: 'bg-yellow-100 text-yellow-800' },
-      inactive: { label: 'Tidak Aktif', variant: 'destructive' as const, className: 'bg-red-100 text-red-800' },
+  const getStatusConfig = (status: string) => {
+    const configs = {
+      active: { 
+        label: 'Aktif', 
+        className: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50',
+        cardBorder: 'border-emerald-200/50 dark:border-emerald-800/30',
+        gradient: 'bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20'
+      },
+      maintenance: { 
+        label: 'Maintenance', 
+        className: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50',
+        cardBorder: 'border-amber-200/50 dark:border-amber-800/30',
+        gradient: 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20'
+      },
+      inactive: { 
+        label: 'Tidak Aktif', 
+        className: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50',
+        cardBorder: 'border-red-200/50 dark:border-red-800/30',
+        gradient: 'bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20'
+      },
     };
     
-    return statusConfig[status as keyof typeof statusConfig] || statusConfig.active;
+    return configs[status as keyof typeof configs] || configs.active;
   };
 
-  const status = getStatusBadge(pond.status);
+  const statusConfig = getStatusConfig(pond.status);
 
   return (
-    <Card className="h-full hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
-      <CardHeader className="pb-3">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <CardTitle className="text-base sm:text-lg font-semibold truncate">
-            {pond.name}
-          </CardTitle>
-          <Badge className={`text-xs w-fit ${status.className}`}>
-            {status.label}
+    <Card className={`group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-1 border ${statusConfig.cardBorder} bg-card`}>
+      {/* Gradient background overlay */}
+      <div className={`absolute inset-0 ${statusConfig.gradient} opacity-50`} />
+      
+      <CardHeader className="relative pb-3 space-y-0">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-lg font-bold text-foreground truncate group-hover:text-primary transition-colors">
+              {pond.name}
+            </CardTitle>
+            <div className="flex items-center mt-1 text-xs text-muted-foreground">
+              <Calendar className="h-3 w-3 mr-1" />
+              <span>Dibuat {new Date(pond.created_at).toLocaleDateString('id-ID')}</span>
+            </div>
+          </div>
+          <Badge className={`${statusConfig.className} font-medium text-xs`}>
+            {statusConfig.label}
           </Badge>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-muted-foreground">Luas</p>
-              <p className="text-sm font-medium text-foreground">{pond.size_m2} m²</p>
+      <CardContent className="relative space-y-6">
+        {/* Main stats in a modern grid */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-background/60 backdrop-blur-sm rounded-lg p-3 border border-border/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground font-medium">Luas Kolam</p>
+                <p className="text-lg font-bold text-foreground">{pond.size_m2}</p>
+                <p className="text-xs text-muted-foreground">m²</p>
+              </div>
+              <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full">
+                <Waves className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Kedalaman</p>
-              <p className="text-sm font-medium text-foreground">{pond.depth_m} m</p>
+          </div>
+
+          <div className="bg-background/60 backdrop-blur-sm rounded-lg p-3 border border-border/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground font-medium">Kedalaman</p>
+                <p className="text-lg font-bold text-foreground">{pond.depth_m}</p>
+                <p className="text-xs text-muted-foreground">meter</p>
+              </div>
+              <div className="bg-cyan-100 dark:bg-cyan-900/30 p-2 rounded-full">
+                <Droplets className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Jumlah Ikan</p>
-              <p className="text-sm font-medium text-foreground">{pond.fish_count}</p>
+          </div>
+
+          <div className="bg-background/60 backdrop-blur-sm rounded-lg p-3 border border-border/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground font-medium">Jumlah Ikan</p>
+                <p className="text-lg font-bold text-foreground">{pond.fish_count}</p>
+                <p className="text-xs text-muted-foreground">ekor</p>
+              </div>
+              <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full">
+                <Fish className="h-4 w-4 text-green-600 dark:text-green-400" />
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Umur Ikan</p>
-              <p className="text-sm font-medium text-foreground">{pond.fish_age_days} hari</p>
+          </div>
+
+          <div className="bg-background/60 backdrop-blur-sm rounded-lg p-3 border border-border/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground font-medium">Umur Ikan</p>
+                <p className="text-lg font-bold text-foreground">{pond.fish_age_days}</p>
+                <p className="text-xs text-muted-foreground">hari</p>
+              </div>
+              <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-full">
+                <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              </div>
             </div>
           </div>
         </div>
 
+        {/* Water quality indicators */}
         {(pond.water_temperature || pond.ph_level) && (
-          <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Suhu</p>
-                <p className="text-sm font-medium text-foreground">{pond.water_temperature}°C</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">pH</p>
-                <p className="text-sm font-medium text-foreground">{pond.ph_level}</p>
-              </div>
+          <div className="bg-background/40 backdrop-blur-sm rounded-lg p-4 border border-border/50">
+            <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center">
+              <Thermometer className="h-4 w-4 mr-2 text-blue-600" />
+              Kualitas Air
+            </h4>
+            <div className="grid grid-cols-2 gap-4">
+              {pond.water_temperature && (
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">Suhu Air</p>
+                  <p className="text-xl font-bold text-foreground">{pond.water_temperature}°C</p>
+                </div>
+              )}
+              {pond.ph_level && (
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">pH Level</p>
+                  <p className="text-xl font-bold text-foreground">{pond.ph_level}</p>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t">
+        {/* Action buttons */}
+        <div className="flex gap-2 pt-2">
           {onEdit && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => onEdit(pond)}
-              className="flex-1 h-8 text-xs"
+              className="flex-1 h-9 bg-background/80 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
             >
-              <Edit className="h-3 w-3 mr-1" />
-              Edit
+              <Edit className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Edit</span>
+              <span className="sm:hidden">Edit</span>
             </Button>
           )}
           {onDelete && (
@@ -91,10 +160,11 @@ export const PondCard = ({ pond, onEdit, onDelete }: PondCardProps) => {
               variant="outline"
               size="sm"
               onClick={() => onDelete(pond.id)}
-              className="flex-1 h-8 text-xs text-red-600 hover:text-red-700 hover:border-red-300"
+              className="flex-1 h-9 bg-background/80 text-destructive border-destructive/20 hover:bg-destructive hover:text-destructive-foreground transition-all duration-200"
             >
-              <Trash2 className="h-3 w-3 mr-1" />
-              Hapus
+              <Trash2 className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Hapus</span>
+              <span className="sm:hidden">Del</span>
             </Button>
           )}
         </div>
