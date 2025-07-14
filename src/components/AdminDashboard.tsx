@@ -117,8 +117,8 @@ const AdminDashboard = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-300">Memuat dashboard admin...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Memuat dashboard admin...</p>
           </div>
         </div>
       </div>
@@ -129,10 +129,10 @@ const AdminDashboard = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard Admin</h2>
-          <p className="text-gray-600 dark:text-gray-300 mt-1">Kelola seluruh sistem budidaya lele</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard Admin</h2>
+          <p className="text-muted-foreground mt-1">Kelola seluruh sistem budidaya lele</p>
         </div>
-        <Badge variant="outline" className="w-fit bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800">
+        <Badge variant="outline" className="w-fit bg-primary/10 text-primary border-primary/20">
           <Users className="h-3 w-3 mr-1" />
           Administrator
         </Badge>
@@ -155,20 +155,20 @@ const AdminDashboard = () => {
       )}
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-red-100/50 dark:border-gray-700/50">
+            <Card key={index} className="bg-card/70 backdrop-blur-sm border-border/50">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-3">
                   <div className={`p-2 rounded-lg ${stat.color}`}>
                     <Icon className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-800 dark:text-white">{stat.value}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{stat.title}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{stat.description}</p>
+                    <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                    <p className="text-sm text-muted-foreground">{stat.title}</p>
+                    <p className="text-xs text-muted-foreground/70">{stat.description}</p>
                   </div>
                 </div>
               </CardContent>
@@ -179,20 +179,20 @@ const AdminDashboard = () => {
 
       {/* System Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-red-100/50 dark:border-gray-700/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Database className="h-5 w-5 text-red-600 dark:text-red-400" />
-              <span>Status Sistem</span>
+              <Database className="h-5 w-5 text-primary" />
+              <span className="text-foreground">Status Sistem</span>
             </CardTitle>
-            <CardDescription>Monitoring real-time seluruh sistem</CardDescription>
+            <CardDescription className="text-muted-foreground">Monitoring real-time seluruh sistem</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className={`w-2 h-2 rounded-full ${systemStatus.database ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Database Connection</span>
+                  <span className="text-sm text-foreground">Database Connection</span>
                 </div>
                 <Badge variant="outline" className={`${systemStatus.database ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'}`}>
                   {systemStatus.database ? 'Online' : 'Offline'}
@@ -201,7 +201,7 @@ const AdminDashboard = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className={`w-2 h-2 rounded-full ${systemStatus.realtime ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Realtime Sync</span>
+                  <span className="text-sm text-foreground">Realtime Sync</span>
                 </div>
                 <Badge variant="outline" className={`${systemStatus.realtime ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800' : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800'}`}>
                   {systemStatus.realtime ? 'Connected' : 'Syncing'}
@@ -210,7 +210,7 @@ const AdminDashboard = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className={`w-2 h-2 rounded-full ${systemStatus.aiAnalysis ? 'bg-blue-500' : 'bg-gray-500'}`}></div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">AI Analysis</span>
+                  <span className="text-sm text-foreground">AI Analysis</span>
                 </div>
                 <Badge variant="outline" className={`${systemStatus.aiAnalysis ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-gray-900/20 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-800'}`}>
                   {systemStatus.aiAnalysis ? 'Ready' : 'Offline'}
@@ -220,13 +220,13 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-red-100/50 dark:border-gray-700/50">
+        <Card className="bg-card/70 backdrop-blur-sm border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-              <span>Peringatan</span>
+              <span className="text-foreground">Peringatan</span>
             </CardTitle>
-            <CardDescription>Alert dan notifikasi penting</CardDescription>
+            <CardDescription className="text-muted-foreground">Alert dan notifikasi penting</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">

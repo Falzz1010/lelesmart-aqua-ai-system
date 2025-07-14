@@ -146,8 +146,8 @@ const UserManagement = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Manajemen Pengguna</h2>
-          <p className="text-gray-600 mt-1">Kelola akses dan peran pengguna sistem</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Manajemen Pengguna</h2>
+          <p className="text-muted-foreground mt-1">Kelola akses dan peran pengguna sistem</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -159,37 +159,39 @@ const UserManagement = () => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Tambah Pengguna Baru</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-foreground">Tambah Pengguna Baru</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
                 Masukkan informasi pengguna yang akan ditambahkan ke sistem
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nama Lengkap *</Label>
+                <Label htmlFor="name" className="text-foreground">Nama Lengkap *</Label>
                 <Input
                   id="name"
                   value={newUser.name}
                   onChange={(e) => setNewUser({...newUser, name: e.target.value})}
                   placeholder="Masukkan nama lengkap"
+                  className="bg-background text-foreground border-border"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email" className="text-foreground">Email *</Label>
                 <Input
                   id="email"
                   type="email"
                   value={newUser.email}
                   onChange={(e) => setNewUser({...newUser, email: e.target.value})}
                   placeholder="user@lelesmart.com"
+                  className="bg-background text-foreground border-border"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="role">Peran *</Label>
+                <Label htmlFor="role" className="text-foreground">Peran *</Label>
                 <Select value={newUser.role} onValueChange={(value) => setNewUser({...newUser, role: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background text-foreground border-border">
                     <SelectValue placeholder="Pilih peran pengguna" />
                   </SelectTrigger>
                   <SelectContent>
@@ -200,23 +202,25 @@ const UserManagement = () => {
                 </Select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">No. Telepon</Label>
+                  <Label htmlFor="phone" className="text-foreground">No. Telepon</Label>
                   <Input
                     id="phone"
                     value={newUser.phone}
                     onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
                     placeholder="081234567890"
+                    className="bg-background text-foreground border-border"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="location">Lokasi/Area</Label>
+                  <Label htmlFor="location" className="text-foreground">Lokasi/Area</Label>
                   <Input
                     id="location"
                     value={newUser.location}
                     onChange={(e) => setNewUser({...newUser, location: e.target.value})}
                     placeholder="Kolam A-C"
+                    className="bg-background text-foreground border-border"
                   />
                 </div>
               </div>
@@ -234,19 +238,19 @@ const UserManagement = () => {
       </div>
 
       {/* Role Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {Object.entries(roleConfig).map(([role, config]) => {
           const Icon = config.icon;
           return (
-            <Card key={role} className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+            <Card key={role} className="bg-card/70 backdrop-blur-sm border-border/50">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-3">
                   <div className={`p-2 rounded-lg ${config.color}`}>
                     <Icon className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-800">{roleStats[role]}</p>
-                    <p className="text-sm text-gray-600">{config.label}</p>
+                    <p className="text-2xl font-bold text-foreground">{roleStats[role]}</p>
+                    <p className="text-sm text-muted-foreground">{config.label}</p>
                   </div>
                 </div>
               </CardContent>
@@ -256,13 +260,13 @@ const UserManagement = () => {
       </div>
 
       {/* Users List */}
-      <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+      <Card className="bg-card/70 backdrop-blur-sm border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Users className="h-5 w-5 text-blue-600" />
-            <span>Daftar Pengguna</span>
+            <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <span className="text-foreground">Daftar Pengguna</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-muted-foreground">
             Total {users.length} pengguna terdaftar dalam sistem
           </CardDescription>
         </CardHeader>
@@ -273,17 +277,17 @@ const UserManagement = () => {
               const RoleIcon = roleInfo.icon;
               
               return (
-                <div key={user.id} className="p-4 bg-white/50 rounded-lg border border-blue-100/30">
-                  <div className="flex items-center justify-between">
+                <div key={user.id} className="p-4 bg-card/50 rounded-lg border border-border/30">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex items-center space-x-4">
                       <Avatar>
                         <AvatarImage src={user.avatar} alt={user.name} />
                         <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                       </Avatar>
                       
-                      <div>
-                        <div className="flex items-center space-x-3">
-                          <h3 className="font-semibold text-gray-800">{user.name}</h3>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                          <h3 className="font-semibold text-foreground">{user.name}</h3>
                           <Badge className={`${roleInfo.color} text-white`}>
                             <RoleIcon className="h-3 w-3 mr-1" />
                             {roleInfo.label}
@@ -296,26 +300,26 @@ const UserManagement = () => {
                           </Badge>
                         </div>
                         
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 text-sm text-gray-600">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 text-sm text-muted-foreground">
                           <div className="flex items-center space-x-1">
                             <Mail className="h-3 w-3" />
-                            <span>{user.email}</span>
+                            <span className="truncate">{user.email}</span>
                           </div>
                           {user.phone && (
                             <div className="flex items-center space-x-1">
                               <Phone className="h-3 w-3" />
-                              <span>{user.phone}</span>
+                              <span className="truncate">{user.phone}</span>
                             </div>
                           )}
                           {user.location && (
                             <div className="flex items-center space-x-1">
                               <MapPin className="h-3 w-3" />
-                              <span>{user.location}</span>
+                              <span className="truncate">{user.location}</span>
                             </div>
                           )}
                         </div>
                         
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-muted-foreground/70 mt-1">
                           Login terakhir: {user.lastLogin}
                         </p>
                       </div>
@@ -326,17 +330,17 @@ const UserManagement = () => {
                         size="sm"
                         variant="ghost"
                         onClick={() => toggleUserStatus(user.id)}
-                        className={user.status === "active" ? "text-orange-600" : "text-green-600"}
+                        className={user.status === "active" ? "text-orange-600 dark:text-orange-400" : "text-green-600 dark:text-green-400"}
                       >
                         {user.status === "active" ? "Nonaktifkan" : "Aktifkan"}
                       </Button>
-                      <Button size="sm" variant="ghost" className="text-blue-600">
+                      <Button size="sm" variant="ghost" className="text-blue-600 dark:text-blue-400">
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button 
                         size="sm" 
                         variant="ghost" 
-                        className="text-red-600"
+                        className="text-red-600 dark:text-red-400"
                         onClick={() => handleDeleteUser(user.id)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -351,26 +355,26 @@ const UserManagement = () => {
       </Card>
 
       {/* Role Permissions */}
-      <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
+      <Card className="bg-card/70 backdrop-blur-sm border-border/50">
         <CardHeader>
-          <CardTitle>Hak Akses Peran</CardTitle>
-          <CardDescription>Ringkasan akses yang dimiliki setiap peran pengguna</CardDescription>
+          <CardTitle className="text-foreground">Hak Akses Peran</CardTitle>
+          <CardDescription className="text-muted-foreground">Ringkasan akses yang dimiliki setiap peran pengguna</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {Object.entries(roleConfig).map(([role, config]) => {
               const Icon = config.icon;
               return (
-                <div key={role} className="p-4 bg-white/50 rounded-lg border border-blue-100/30">
+                <div key={role} className="p-4 bg-card/50 rounded-lg border border-border/30">
                   <div className="flex items-center space-x-3 mb-3">
                     <div className={`p-2 rounded ${config.color}`}>
                       <Icon className="h-4 w-4 text-white" />
                     </div>
-                    <h4 className="font-semibold text-gray-800">{config.label}</h4>
+                    <h4 className="font-semibold text-foreground">{config.label}</h4>
                   </div>
-                  <p className="text-sm text-gray-600 mb-3">{config.description}</p>
+                  <p className="text-sm text-muted-foreground mb-3">{config.description}</p>
                   
-                  <div className="space-y-1 text-xs text-gray-500">
+                  <div className="space-y-1 text-xs text-muted-foreground/70">
                     {role === "admin" && (
                       <>
                         <p>✓ Akses semua fitur</p>

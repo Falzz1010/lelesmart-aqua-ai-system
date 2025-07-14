@@ -82,8 +82,8 @@ const HealthDetection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Deteksi Kesehatan</h2>
-        <p className="text-gray-600 dark:text-gray-300 mt-1">Monitor dan catat kondisi kesehatan ikan lele</p>
+        <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Deteksi Kesehatan</h2>
+        <p className="text-muted-foreground mt-1">Monitor dan catat kondisi kesehatan ikan lele</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -181,16 +181,18 @@ const HealthDetection = () => {
           <CardContent>
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {healthRecords?.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                  Belum ada catatan kesehatan
-                </p>
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground text-center py-4">
+                    Belum ada catatan kesehatan. Mulai monitoring kesehatan kolam Anda.
+                  </p>
+                </div>
               ) : (
                 healthRecords?.map((record) => {
                   const pond = ponds?.find(p => p.id === record.pond_id);
                   return (
                     <div key={record.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-gray-900 dark:text-white">{pond?.name || 'Unknown Pond'}</h4>
+                        <h4 className="font-medium text-foreground">{pond?.name || 'Unknown Pond'}</h4>
                         <Badge className={getStatusColor(record.health_status)}>
                           {getStatusIcon(record.health_status)}
                           <span className="ml-1">
@@ -200,23 +202,17 @@ const HealthDetection = () => {
                         </Badge>
                       </div>
                       {record.symptoms && (
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+                        <p className="text-sm text-muted-foreground mb-1">
                           <strong>Gejala:</strong> {record.symptoms}
                         </p>
                       )}
                       {record.treatment && (
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+                        <p className="text-sm text-muted-foreground mb-1">
                           <strong>Pengobatan:</strong> {record.treatment}
                         </p>
                       )}
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {new Date(record.created_at).toLocaleDateString('id-ID', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                      <p className="text-xs text-muted-foreground/70">
+                        Tanggal: {new Date(record.created_at).toLocaleDateString('id-ID')}
                       </p>
                     </div>
                   );

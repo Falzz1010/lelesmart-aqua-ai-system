@@ -81,19 +81,19 @@ export const AdminAuth = () => {
             </p>
           </div>
 
-          <Card>
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-center">
+              <CardTitle className="text-center text-foreground">
                 {isSignUp ? 'Daftar Admin' : 'Masuk Admin'}
               </CardTitle>
-              <CardDescription className="text-center">
+              <CardDescription className="text-center text-muted-foreground">
                 {isSignUp ? 'Buat akun administrator baru' : 'Masuk dengan akun administrator'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Admin</Label>
+                  <Label htmlFor="email" className="text-foreground">Email Admin</Label>
                   <Input
                     id="email"
                     type="email"
@@ -101,12 +101,12 @@ export const AdminAuth = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="admin@gmail.com atau admin@lelesmart.com"
                     required
-                    className="w-full"
+                    className="w-full bg-background text-foreground border-border"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-foreground">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -115,7 +115,7 @@ export const AdminAuth = () => {
                     placeholder="Minimal 6 karakter"
                     required
                     minLength={6}
-                    className="w-full"
+                    className="w-full bg-background text-foreground border-border"
                   />
                 </div>
 

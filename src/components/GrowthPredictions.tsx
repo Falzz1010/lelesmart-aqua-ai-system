@@ -257,8 +257,8 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="px-1">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Prediksi Panen & Pertumbuhan</h2>
-        <p className="text-gray-600 mt-1 text-sm sm:text-base">Analisis AI berdasarkan data real-time untuk estimasi hasil panen dan strategi optimal</p>
+        <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Prediksi Panen & Pertumbuhan</h2>
+        <p className="text-muted-foreground mt-1 text-sm sm:text-base">Analisis AI berdasarkan data real-time untuk estimasi hasil panen dan strategi optimal</p>
       </div>
 
       {/* AI Prediction Section */}
@@ -301,7 +301,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
             )}
           </Button>
           {ponds.length === 0 && (
-            <p className="text-sm text-gray-500 text-center">Tambahkan kolam terlebih dahulu untuk menggunakan fitur AI</p>
+            <p className="text-sm text-muted-foreground text-center">Tambahkan kolam terlebih dahulu untuk menggunakan fitur AI</p>
           )}
         </CardContent>
       </Card>
@@ -369,8 +369,8 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Rata-rata Pertumbuhan</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-800 truncate">{growthMetrics.avgGrowthRate.toFixed(1)}g/hari</p>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">Rata-rata Pertumbuhan</p>
+                <p className="text-lg sm:text-2xl font-bold text-foreground truncate">{growthMetrics.avgGrowthRate.toFixed(1)}g/hari</p>
                 <div className="flex items-center space-x-1 mt-1">
                   <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
                   <span className="text-xs sm:text-sm text-green-600">Real-time</span>
@@ -385,8 +385,8 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Total Biomassa</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-800 truncate">{growthMetrics.totalBiomass.toFixed(1)} ton</p>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">Total Biomassa</p>
+                <p className="text-lg sm:text-2xl font-bold text-foreground truncate">{growthMetrics.totalBiomass.toFixed(1)} ton</p>
                 <div className="flex items-center space-x-1 mt-1">
                   <Fish className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                   <span className="text-xs sm:text-sm text-blue-600">Aktual</span>
@@ -401,8 +401,8 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Survival Rate</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-800 truncate">{growthMetrics.avgSurvivalRate.toFixed(0)}%</p>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">Survival Rate</p>
+                <p className="text-lg sm:text-2xl font-bold text-foreground truncate">{growthMetrics.avgSurvivalRate.toFixed(0)}%</p>
                 <div className="flex items-center space-x-1 mt-1">
                   <Target className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
                   <span className="text-xs sm:text-sm text-green-600">Berdasarkan kesehatan</span>
@@ -417,8 +417,8 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">FCR Rata-rata</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-800 truncate">{growthMetrics.avgFCR.toFixed(1)}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">FCR Rata-rata</p>
+                <p className="text-lg sm:text-2xl font-bold text-foreground truncate">{growthMetrics.avgFCR.toFixed(1)}</p>
                 <div className="flex items-center space-x-1 mt-1">
                   <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
                   <span className="text-xs sm:text-sm text-orange-600">Dari data pakan</span>
@@ -434,9 +434,9 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
       {predictions.length === 0 ? (
         <Card className="bg-white/70 backdrop-blur-sm border-blue-100/50">
           <CardContent className="text-center py-8 sm:py-12 px-4">
-            <Fish className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">Belum Ada Data Kolam</h3>
-            <p className="text-sm sm:text-base text-gray-500 mb-4">Tambahkan kolam untuk melihat prediksi panen real-time</p>
+            <Fish className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-semibold text-muted-foreground mb-2">Belum Ada Data Kolam</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4">Tambahkan kolam untuk melihat prediksi panen real-time</p>
           </CardContent>
         </Card>
       ) : (
@@ -465,26 +465,26 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
                   <div className="text-center p-2 sm:p-3 bg-blue-50/50 rounded-lg">
                     <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 mx-auto mb-1" />
                     <p className="text-xs sm:text-sm font-medium truncate">{prediction.estimatedHarvest}</p>
-                    <p className="text-xs text-gray-600">Target Panen</p>
+                    <p className="text-xs text-muted-foreground">Target Panen</p>
                   </div>
                   <div className="text-center p-2 sm:p-3 bg-green-50/50 rounded-lg">
                     <Target className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 mx-auto mb-1" />
                     <p className="text-xs sm:text-sm font-medium truncate">{prediction.expectedYield} ton</p>
-                    <p className="text-xs text-gray-600">Prediksi Hasil</p>
+                    <p className="text-xs text-muted-foreground">Prediksi Hasil</p>
                   </div>
                 </div>
 
                 <div className="space-y-2 text-xs sm:text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Berat/ekor:</span>
+                    <span className="text-muted-foreground">Berat/ekor:</span>
                     <span className="font-medium">{prediction.predictedWeight.toFixed(0)}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Estimasi Hidup:</span>
+                    <span className="text-muted-foreground">Estimasi Hidup:</span>
                     <span className="font-medium">{prediction.predictedCount} ekor</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Margin Profit:</span>
+                    <span className="text-muted-foreground">Margin Profit:</span>
                     <span className="font-medium text-green-600">{prediction.profitMargin}%</span>
                   </div>
                 </div>
@@ -519,14 +519,14 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div className="text-center p-3 sm:p-4 bg-blue-50/50 rounded-lg">
-                <p className="text-xs sm:text-sm text-gray-600">Harga Saat Ini</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Harga Saat Ini</p>
                 <p className="text-lg sm:text-2xl font-bold text-blue-600">
                   Rp {marketPredictions.currentPrice.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500">per kg</p>
+                <p className="text-xs text-muted-foreground/70">per kg</p>
               </div>
               <div className="text-center p-3 sm:p-4 bg-green-50/50 rounded-lg">
-                <p className="text-xs sm:text-sm text-gray-600">Prediksi 1 Bulan</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Prediksi 1 Bulan</p>
                 <p className="text-lg sm:text-2xl font-bold text-green-600">
                   Rp {marketPredictions.predictedPrice.toLocaleString()}
                 </p>
@@ -571,13 +571,13 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
             <div className="grid grid-cols-1 gap-3">
               <div className="p-3 bg-blue-50/50 rounded-lg">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs sm:text-sm text-gray-700">Total Estimasi Panen:</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">Total Estimasi Panen:</span>
                   <span className="font-bold text-blue-600 text-sm sm:text-base">{growthMetrics.totalBiomass.toFixed(1)} ton</span>
                 </div>
               </div>
               <div className="p-3 bg-green-50/50 rounded-lg">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs sm:text-sm text-gray-700">Estimasi Pendapatan:</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">Estimasi Pendapatan:</span>
                   <span className="font-bold text-green-600 text-sm sm:text-base">
                     Rp {(growthMetrics.totalBiomass * marketPredictions.predictedPrice).toFixed(0)} ribu
                   </span>
@@ -585,7 +585,7 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
               </div>
               <div className="p-3 bg-purple-50/50 rounded-lg">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs sm:text-sm text-gray-700">Proyeksi Profit:</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">Proyeksi Profit:</span>
                   <span className="font-bold text-purple-600 text-sm sm:text-base">
                     Rp {(growthMetrics.totalBiomass * marketPredictions.predictedPrice * 0.35).toFixed(0)} ribu
                   </span>

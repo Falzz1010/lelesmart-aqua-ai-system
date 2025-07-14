@@ -39,60 +39,38 @@ export const PondCard = ({ pond, onEdit, onDelete }: PondCardProps) => {
       
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="flex items-center space-x-2">
-            <Droplets className="h-4 w-4 text-blue-500 flex-shrink-0" />
-            <div className="min-w-0">
-              <p className="text-xs text-gray-500">Luas</p>
-              <p className="font-medium truncate">{pond.size_m2} m²</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Luas</p>
+              <p className="text-sm font-medium text-foreground">{pond.size_m2} m²</p>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Fish className="h-4 w-4 text-teal-500 flex-shrink-0" />
-            <div className="min-w-0">
-              <p className="text-xs text-gray-500">Kedalaman</p>
-              <p className="font-medium truncate">{pond.depth_m} m</p>
+            <div>
+              <p className="text-xs text-muted-foreground">Kedalaman</p>
+              <p className="text-sm font-medium text-foreground">{pond.depth_m} m</p>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Fish className="h-4 w-4 text-green-500 flex-shrink-0" />
-            <div className="min-w-0">
-              <p className="text-xs text-gray-500">Jumlah Ikan</p>
-              <p className="font-medium truncate">{pond.fish_count.toLocaleString()} ekor</p>
+            <div>
+              <p className="text-xs text-muted-foreground">Jumlah Ikan</p>
+              <p className="text-sm font-medium text-foreground">{pond.fish_count}</p>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Calendar className="h-4 w-4 text-purple-500 flex-shrink-0" />
-            <div className="min-w-0">
-              <p className="text-xs text-gray-500">Umur Ikan</p>
-              <p className="font-medium truncate">{pond.fish_age_days} hari</p>
+            <div>
+              <p className="text-xs text-muted-foreground">Umur Ikan</p>
+              <p className="text-sm font-medium text-foreground">{pond.fish_age_days} hari</p>
             </div>
           </div>
         </div>
 
         {(pond.water_temperature || pond.ph_level) && (
           <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t">
-            {pond.water_temperature && (
-              <div className="flex items-center space-x-2">
-                <Thermometer className="h-4 w-4 text-red-500 flex-shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-xs text-gray-500">Suhu</p>
-                  <p className="font-medium truncate">{pond.water_temperature}°C</p>
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Suhu</p>
+                <p className="text-sm font-medium text-foreground">{pond.water_temperature}°C</p>
               </div>
-            )}
-            
-            {pond.ph_level && (
-              <div className="flex items-center space-x-2">
-                <Droplets className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-xs text-gray-500">pH</p>
-                  <p className="font-medium truncate">{pond.ph_level}</p>
-                </div>
+              <div>
+                <p className="text-xs text-muted-foreground">pH</p>
+                <p className="text-sm font-medium text-foreground">{pond.ph_level}</p>
               </div>
-            )}
+            </div>
           </div>
         )}
 
