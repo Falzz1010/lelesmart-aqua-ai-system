@@ -417,6 +417,53 @@ export type Database = {
           },
         ]
       }
+      water_quality_logs: {
+        Row: {
+          ammonia_level: number | null
+          created_at: string
+          dissolved_oxygen: number | null
+          id: string
+          nitrate_level: number | null
+          nitrite_level: number | null
+          ph_level: number | null
+          pond_id: string
+          recorded_at: string
+          temperature: number | null
+        }
+        Insert: {
+          ammonia_level?: number | null
+          created_at?: string
+          dissolved_oxygen?: number | null
+          id?: string
+          nitrate_level?: number | null
+          nitrite_level?: number | null
+          ph_level?: number | null
+          pond_id: string
+          recorded_at?: string
+          temperature?: number | null
+        }
+        Update: {
+          ammonia_level?: number | null
+          created_at?: string
+          dissolved_oxygen?: number | null
+          id?: string
+          nitrate_level?: number | null
+          nitrite_level?: number | null
+          ph_level?: number | null
+          pond_id?: string
+          recorded_at?: string
+          temperature?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_quality_logs_pond_id_fkey"
+            columns: ["pond_id"]
+            isOneToOne: false
+            referencedRelation: "ponds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

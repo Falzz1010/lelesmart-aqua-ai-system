@@ -73,11 +73,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!existingAdmin) {
         console.log('Admin user not found, creating...');
         
-        // Try to sign up admin user
+        // Try to sign up admin user with emailRedirectTo
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: 'admin@gmail.com',
           password: 'admin123',
           options: {
+            emailRedirectTo: `${window.location.origin}/admin`,
             data: {
               full_name: 'Administrator',
               role: 'admin'
@@ -85,28 +86,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         });
 
-        if (signUpError) {
+        if (signUpError && !signUpError.message.includes('User already registered')) {
           console.error('Error creating admin user:', signUpError);
           return;
         }
 
-        if (signUpData.user) {
-          console.log('Admin user created successfully');
-          
-          // Create profile for admin user
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: signUpData.user.id,
-              email: 'admin@gmail.com',
-              full_name: 'Administrator',
-              role: 'admin'
-            });
+        // If user already exists or was just created, ensure profile exists
+        if (signUpData.user || signUpError?.message.includes('User already registered')) {
+          const userId = signUpData.user?.id;
+          if (userId) {
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: userId,
+                email: 'admin@gmail.com',
+                full_name: 'Administrator',
+                role: 'admin'
+              }, { onConflict: 'id' });
 
-          if (profileError) {
-            console.error('Error creating admin profile:', profileError);
-          } else {
-            console.log('Admin profile created successfully');
+            if (profileError) {
+              console.error('Error creating/updating admin profile:', profileError);
+            } else {
+              console.log('Admin profile created/updated successfully');
+            }
           }
         }
       } else {

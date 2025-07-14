@@ -39,19 +39,12 @@ All colors MUST be HSL.
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -66,7 +59,7 @@ All colors MUST be HSL.
     --popover-foreground: 210 40% 98%;
 
     --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -83,6 +76,7 @@ All colors MUST be HSL.
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -134,12 +128,15 @@ All colors MUST be HSL.
 
   .dark .text-gray-700 { @apply text-gray-300; }
   .dark .text-gray-800 { @apply text-gray-200; }
-  .dark .text-black { @apply text-white; }
+  .dark .text-gray-600 { @apply text-gray-400; }
+  .dark .text-gray-500 { @apply text-gray-500; }
+  .dark .text-black { @apply text-foreground; }
 
   /* Background overrides for dark mode */
-  .dark .bg-white\/95 { @apply bg-gray-900/95; }
-  .dark .bg-white\/70 { @apply bg-gray-800/70; }
-  .dark .bg-white\/50 { @apply bg-gray-800/50; }
+  .dark .bg-white\/95 { @apply bg-card/95; }
+  .dark .bg-white\/70 { @apply bg-card/70; }
+  .dark .bg-white\/50 { @apply bg-card/50; }
+  .dark .bg-white { @apply bg-card; }
 
   .dark .bg-blue-50\/50   { @apply bg-blue-900/20; }
   .dark .bg-green-50\/50  { @apply bg-green-900/20; }
@@ -157,4 +154,6 @@ All colors MUST be HSL.
   .dark .border-yellow-100\/50 { @apply border-yellow-800/50; }
 
   .dark .border-blue-100\/30   { @apply border-blue-800/30; }
+  .dark .border-gray-200 { @apply border-border; }
+  .dark .border-gray-300 { @apply border-border; }
 }

@@ -76,15 +76,17 @@ const Index = () => {
         
         <SidebarInset className="flex-1 flex flex-col min-w-0">
           {/* Mobile Header */}
-          <header className={`sticky top-0 z-40 border-b ${isAdmin ? 'border-red-100/50 bg-red-50/95 dark:border-red-800/50 dark:bg-red-900/95' : 'border-blue-100/50 bg-white/95 dark:border-blue-800/50 dark:bg-gray-900/95'} backdrop-blur-md lg:hidden`}>
+          <header className={`sticky top-0 z-40 border-b ${isAdmin ? 'border-red-100/50 bg-red-50/95 dark:border-red-800/50 dark:bg-red-900/95' : 'border-blue-100/50 bg-white/95 dark:border-blue-800/50 dark:bg-card/95'} backdrop-blur-md lg:hidden`}>
             <div className="flex h-12 sm:h-14 items-center justify-between px-3 sm:px-4">
-              <div className="flex items-center">
-                <SidebarTrigger className="mr-2" />
+              <div className="flex items-center min-w-0">
+                <SidebarTrigger className="mr-2 flex-shrink-0" />
                 <h1 className="font-semibold text-sm sm:text-base truncate text-foreground">
                   {isAdmin ? 'LeleSmart Admin' : 'LeleSmart'}
                 </h1>
               </div>
-              <ThemeToggle />
+              <div className="flex-shrink-0">
+                <ThemeToggle />
+              </div>
             </div>
           </header>
 
@@ -94,7 +96,7 @@ const Index = () => {
           </div>
 
           {/* Main Content */}
-          <main className="flex-1 p-3 sm:p-4 lg:p-6 xl:p-8 overflow-hidden">
+          <main className="flex-1 p-2 sm:p-3 lg:p-6 xl:p-8 overflow-hidden">
             <div className="mx-auto max-w-7xl h-full">
               <div className="h-full overflow-auto">
                 {renderContent()}
