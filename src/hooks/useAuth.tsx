@@ -55,6 +55,73 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return email === 'admin@gmail.com' || email === 'admin@lelesmart.com';
   };
 
+  // Function to ensure admin user exists
+  const ensureAdminUser = async () => {
+    try {
+      // Check if admin user exists
+      const { data: existingAdmin, error: checkError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', 'admin@gmail.com')
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking admin user:', checkError);
+        return;
+      }
+
+      if (!existingAdmin) {
+        console.log('Admin user not found, creating...');
+        
+        // Try to sign up admin user
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: 'admin@gmail.com',
+          password: 'admin123',
+          options: {
+            data: {
+              full_name: 'Administrator',
+              role: 'admin'
+            }
+          }
+        });
+
+        if (signUpError) {
+          console.error('Error creating admin user:', signUpError);
+          return;
+        }
+
+        if (signUpData.user) {
+          console.log('Admin user created successfully');
+          
+          // Create profile for admin user
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: signUpData.user.id,
+              email: 'admin@gmail.com',
+              full_name: 'Administrator',
+              role: 'admin'
+            });
+
+          if (profileError) {
+            console.error('Error creating admin profile:', profileError);
+          } else {
+            console.log('Admin profile created successfully');
+          }
+        }
+      } else {
+        console.log('Admin user already exists');
+      }
+    } catch (error) {
+      console.error('Error ensuring admin user:', error);
+    }
+  };
+
+  // Ensure admin user exists on app start
+  useEffect(() => {
+    ensureAdminUser();
+  }, []);
+
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
     

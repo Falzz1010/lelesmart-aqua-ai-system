@@ -46,7 +46,7 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
   const collapsed = state === "collapsed";
 
   return (
-    <Sidebar className="border-r border-blue-100/50 bg-white/95 backdrop-blur-sm">
+    <Sidebar className="border-r border-border/50 bg-card/95 backdrop-blur-sm">
       <SidebarHeader className="p-3 sm:p-4">
         <div className="flex items-center space-x-2 sm:space-x-3">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -57,7 +57,7 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
               <h1 className="text-base sm:text-lg lg:text-xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent truncate">
                 LeleSmart
               </h1>
-              <p className="text-xs sm:text-sm text-gray-600 truncate">
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
                 Sistem Cerdas Budidaya
               </p>
             </div>
@@ -67,7 +67,7 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
 
       <SidebarContent className="px-2 sm:px-3">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs sm:text-sm">Menu Utama</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xs sm:text-sm text-muted-foreground">Menu Utama</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {navigationItems.map((item) => {
@@ -77,7 +77,7 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
                     <SidebarMenuButton
                       onClick={() => onTabChange(item.id)}
                       isActive={activeTab === item.id}
-                      className="w-full justify-start h-9 sm:h-10 text-sm px-2 sm:px-3 hover:bg-blue-50 data-[active=true]:bg-blue-100 data-[active=true]:text-blue-700 transition-colors"
+                      className="w-full justify-start h-9 sm:h-10 text-sm px-2 sm:px-3 hover:bg-primary/10 data-[active=true]:bg-primary/20 data-[active=true]:text-primary transition-colors"
                     >
                       <Icon className="h-4 w-4 flex-shrink-0" />
                       {!collapsed && (
@@ -95,24 +95,24 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
 
         {!collapsed && (
           <SidebarGroup className="mt-4">
-            <SidebarGroupLabel className="text-xs sm:text-sm">Status Sistem</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-xs sm:text-sm text-muted-foreground">Status Sistem</SidebarGroupLabel>
             <SidebarGroupContent className="space-y-2 px-2">
               <div className="flex items-center justify-between text-xs sm:text-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-700 truncate">Database Online</span>
+                  <span className="text-foreground truncate">Database Online</span>
                 </div>
               </div>
               <div className="flex items-center justify-between text-xs sm:text-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-700 truncate">Realtime Aktif</span>
+                  <span className="text-foreground truncate">Realtime Aktif</span>
                 </div>
               </div>
               <div className="flex items-center justify-between text-xs sm:text-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                  <span className="text-gray-700 truncate">AI Standby</span>
+                  <span className="text-foreground truncate">AI Standby</span>
                 </div>
               </div>
             </SidebarGroupContent>
@@ -124,20 +124,20 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
         <div className="flex items-center space-x-2 sm:space-x-3">
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <Badge variant="outline" className="text-blue-600 border-blue-200 mb-1 text-xs">
+              <Badge variant="outline" className="text-primary border-primary/20 mb-1 text-xs">
                 Peternak
               </Badge>
-              <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+              <p className="text-xs sm:text-sm font-medium text-foreground truncate">
                 {user?.email}
               </p>
-              <p className="text-xs text-gray-500 truncate">Selamat datang kembali</p>
+              <p className="text-xs text-muted-foreground truncate">Selamat datang kembali</p>
             </div>
           )}
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={signOut}
-            className="text-gray-600 hover:text-red-600 flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9"
+            className="text-muted-foreground hover:text-red-600 dark:hover:text-red-400 flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9"
           >
             <LogOut className="h-4 w-4" />
           </Button>

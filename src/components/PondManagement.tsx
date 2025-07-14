@@ -105,8 +105,8 @@ const PondManagement = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Manajemen Kolam</h2>
-          <p className="text-gray-600">Atur dan pantau semua kolam Anda</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Manajemen Kolam</h2>
+          <p className="text-muted-foreground">Atur dan pantau semua kolam Anda</p>
         </div>
         <Button onClick={() => setIsFormOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />

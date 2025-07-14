@@ -43,8 +43,8 @@ const Index = () => {
       case "system":
         return isAdmin ? (
           <div className="p-4 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">Pengaturan Sistem</h2>
-            <p className="text-gray-600 dark:text-gray-300">Fitur pengaturan sistem akan segera hadir.</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Pengaturan Sistem</h2>
+            <p className="text-muted-foreground">Fitur pengaturan sistem akan segera hadir.</p>
           </div>
         ) : <DashboardStats />;
       default:
@@ -56,8 +56,8 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -80,7 +80,7 @@ const Index = () => {
             <div className="flex h-12 sm:h-14 items-center justify-between px-3 sm:px-4">
               <div className="flex items-center">
                 <SidebarTrigger className="mr-2" />
-                <h1 className="font-semibold text-sm sm:text-base truncate">
+                <h1 className="font-semibold text-sm sm:text-base truncate text-foreground">
                   {isAdmin ? 'LeleSmart Admin' : 'LeleSmart'}
                 </h1>
               </div>

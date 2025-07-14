@@ -134,8 +134,8 @@ const FeedRecommendations = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Rekomendasi Pakan AI</h2>
-          <p className="text-gray-600 mt-1">Jadwal pemberian pakan optimal berdasarkan AI</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Rekomendasi Pakan AI</h2>
+          <p className="text-muted-foreground mt-1">Jadwal pemberian pakan optimal berdasarkan AI</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -305,10 +305,10 @@ const FeedRecommendations = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             {todaySchedules.length === 0 ? (
-              <div className="text-center py-8">
-                <Fish className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Belum ada jadwal pakan hari ini</p>
-                <p className="text-sm text-gray-400">Tambah jadwal pakan untuk memulai</p>
+              <div className="text-center py-12">
+                <Fish className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Belum ada jadwal pakan hari ini</p>
+                <p className="text-sm text-muted-foreground/70">Tambah jadwal pakan untuk memulai</p>
               </div>
             ) : (
               todaySchedules.map((schedule) => (
@@ -317,7 +317,7 @@ const FeedRecommendations = () => {
                     <div className="flex items-center space-x-3">
                       <div className="flex items-center space-x-2">
                         <div className={`w-3 h-3 rounded-full ${getStatusColor(schedule.status)}`}></div>
-                        <span className="font-semibold text-gray-800">{schedule.feeding_time}</span>
+                        <span className="font-semibold text-foreground">{schedule.feeding_time}</span>
                       </div>
                     </div>
                     <Badge className={getStatusColor(schedule.status)}>
@@ -327,17 +327,17 @@ const FeedRecommendations = () => {
                   
                   <div className="grid grid-cols-2 gap-4 mb-3">
                     <div>
-                      <p className="text-sm text-gray-600">Kolam:</p>
+                      <p className="text-sm text-muted-foreground">Kolam:</p>
                       <p className="font-medium">{schedule.ponds?.name || 'Unknown'}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Jumlah:</p>
+                      <p className="text-sm text-muted-foreground">Jumlah:</p>
                       <p className="font-semibold text-lg">{schedule.feed_amount_kg} kg</p>
                     </div>
                   </div>
 
                   <div className="mb-3">
-                    <p className="text-sm text-gray-600">Jenis Pakan:</p>
+                    <p className="text-sm text-muted-foreground">Jenis Pakan:</p>
                     <p className="font-medium">{schedule.feed_type}</p>
                   </div>
 
@@ -379,7 +379,7 @@ const FeedRecommendations = () => {
                     <div key={day} className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <span className="text-sm font-medium w-8">{day}</span>
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                           <span>{completed}/{total}</span>
                         </div>
                       </div>

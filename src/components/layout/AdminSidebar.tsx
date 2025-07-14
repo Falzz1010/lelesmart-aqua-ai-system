@@ -49,7 +49,7 @@ export const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
   const collapsed = state === "collapsed";
 
   return (
-    <Sidebar className="border-r border-red-100/50 bg-red-50/30 backdrop-blur-sm">
+    <Sidebar className="border-r border-border/50 bg-card/95 backdrop-blur-sm">
       <SidebarHeader className="p-3 sm:p-4">
         <div className="flex items-center space-x-2 sm:space-x-3">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -60,7 +60,7 @@ export const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
               <h1 className="text-base sm:text-lg lg:text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent truncate">
                 LeleSmart Admin
               </h1>
-              <p className="text-xs sm:text-sm text-red-600 truncate">
+              <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 truncate">
                 Control Panel
               </p>
             </div>
@@ -70,7 +70,7 @@ export const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
 
       <SidebarContent className="px-2 sm:px-3">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs sm:text-sm text-red-700">Menu Admin</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xs sm:text-sm text-muted-foreground">Menu Admin</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {adminNavigationItems.map((item) => {
@@ -80,7 +80,7 @@ export const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
                     <SidebarMenuButton
                       onClick={() => onTabChange(item.id)}
                       isActive={activeTab === item.id}
-                      className="w-full justify-start h-9 sm:h-10 text-sm px-2 sm:px-3 hover:bg-red-50 data-[active=true]:bg-red-100 data-[active=true]:text-red-700 transition-colors"
+                      className="w-full justify-start h-9 sm:h-10 text-sm px-2 sm:px-3 hover:bg-primary/10 data-[active=true]:bg-primary/20 data-[active=true]:text-primary transition-colors"
                     >
                       <Icon className="h-4 w-4 flex-shrink-0" />
                       {!collapsed && (
@@ -98,23 +98,23 @@ export const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
 
         {!collapsed && (
           <SidebarGroup className="mt-4">
-            <SidebarGroupLabel className="text-xs sm:text-sm text-red-700">Status Sistem</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-xs sm:text-sm text-muted-foreground">Status Sistem</SidebarGroupLabel>
             <SidebarGroupContent className="space-y-2 px-2">
               <div className="flex items-center justify-between text-xs sm:text-sm">
                 <div className="flex items-center space-x-2">
-                  <Database className="w-4 h-4 text-red-600" />
-                  <span className="text-gray-700 truncate">Server Status</span>
+                  <Database className="w-4 h-4 text-red-600 dark:text-red-400" />
+                  <span className="text-foreground truncate">Server Status</span>
                 </div>
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+                <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800 text-xs">
                   Online
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-xs sm:text-sm">
                 <div className="flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-red-600" />
-                  <span className="text-gray-700 truncate">Active Users</span>
+                  <Users className="w-4 h-4 text-red-600 dark:text-red-400" />
+                  <span className="text-foreground truncate">Active Users</span>
                 </div>
-                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs">
+                <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 text-xs">
                   Connected
                 </Badge>
               </div>
@@ -127,21 +127,21 @@ export const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
         <div className="flex items-center space-x-2 sm:space-x-3">
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <Badge variant="outline" className="text-red-600 border-red-200 mb-1 text-xs bg-red-50">
+              <Badge variant="outline" className="text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 mb-1 text-xs bg-red-50 dark:bg-red-900/20">
                 <Shield className="h-3 w-3 mr-1" />
                 Administrator
               </Badge>
-              <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+              <p className="text-xs sm:text-sm font-medium text-foreground truncate">
                 {user?.email}
               </p>
-              <p className="text-xs text-gray-500 truncate">Full System Access</p>
+              <p className="text-xs text-muted-foreground truncate">Full System Access</p>
             </div>
           )}
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={signOut}
-            className="text-gray-600 hover:text-red-600 flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9"
+            className="text-muted-foreground hover:text-red-600 dark:hover:text-red-400 flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9"
           >
             <LogOut className="h-4 w-4" />
           </Button>
