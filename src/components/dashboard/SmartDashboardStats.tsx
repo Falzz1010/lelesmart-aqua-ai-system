@@ -14,12 +14,18 @@ import {
   Calendar,
   Target,
   Brain,
-  Zap
+  Zap,
+  RefreshCw,
+  BarChart3,
+  Waves,
+  Clock
 } from "lucide-react";
 import { usePonds } from "@/hooks/usePonds";
 import { useAIAssistant } from "@/hooks/useAIAssistant";
+import { useRealtimeData } from "@/hooks/useRealtimeData";
 import { AIAssistant } from "@/components/ai/AIAssistant";
 import { PondMonitor } from "@/components/realtime/PondMonitor";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 interface StatCardProps {
@@ -100,9 +106,16 @@ const StatCard = ({
 export const SmartDashboardStats = () => {
   const { ponds, isLoading } = usePonds();
   const { analyzePondData, isAnalyzing } = useAIAssistant();
+  const { feedingSchedules, healthRecords } = useRealtimeData();
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [healthScore, setHealthScore] = useState(85);
   const [productivityScore, setProductivityScore] = useState(78);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [realtimeData, setRealtimeData] = useState({
+    activeFeedingSchedules: 0,
+    recentHealthRecords: 0,
+    waterQualityAlerts: 0
+  });
 
   // Calculate dashboard metrics
   const totalPonds = ponds.length;
@@ -149,23 +162,69 @@ export const SmartDashboardStats = () => {
     setShowAIAssistant(true);
   };
 
-  // Simulate real-time updates
+  // Update real-time data
+  const updateRealtimeData = () => {
+    const activeFeedingSchedules = feedingSchedules.filter(f => f.status === 'pending').length;
+    const recentHealthRecords = healthRecords.filter(h => {
+      const recordDate = new Date(h.created_at);
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      return recordDate > oneDayAgo;
+    }).length;
+    
+    const waterQualityAlerts = ponds.filter(p => {
+      const tempAlert = p.water_temperature && (p.water_temperature < 26 || p.water_temperature > 30);
+      const phAlert = p.ph_level && (p.ph_level < 6.5 || p.ph_level > 8.5);
+      return tempAlert || phAlert;
+    }).length;
+
+    setRealtimeData({
+      activeFeedingSchedules,
+      recentHealthRecords,
+      waterQualityAlerts
+    });
+    setLastUpdate(new Date());
+  };
+
+  // Set up real-time updates and subscriptions
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Simulate small changes in health and productivity scores
+    updateRealtimeData();
+
+    // Set up real-time subscriptions
+    const channels = [
+      supabase.channel('user-feeding').on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'feeding_schedules' }, 
+        updateRealtimeData
+      ),
+      supabase.channel('user-health').on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'health_records' }, 
+        updateRealtimeData
+      ),
+      supabase.channel('user-ponds').on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'ponds' }, 
+        updateRealtimeData
+      )
+    ];
+
+    channels.forEach(channel => channel.subscribe());
+
+    // Simulate real-time score updates
+    const scoreInterval = setInterval(() => {
       setHealthScore(prev => {
-        const change = (Math.random() - 0.5) * 2; // -1 to +1
+        const change = (Math.random() - 0.5) * 1.5;
         return Math.max(0, Math.min(100, prev + change));
       });
       
       setProductivityScore(prev => {
-        const change = (Math.random() - 0.5) * 1.5; // -0.75 to +0.75
+        const change = (Math.random() - 0.5) * 1;
         return Math.max(0, Math.min(100, prev + change));
       });
-    }, 10000); // Update every 10 seconds
+    }, 15000);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      channels.forEach(channel => supabase.removeChannel(channel));
+      clearInterval(scoreInterval);
+    };
+  }, [feedingSchedules.length, healthRecords.length, ponds.length]);
 
   if (isLoading) {
     return (
@@ -178,65 +237,104 @@ export const SmartDashboardStats = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header with AI Button */}
+    <div className="space-y-4 md:space-y-6">
+      {/* Header with Real-time Info */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard Cerdas</h2>
           <p className="text-muted-foreground">Monitoring real-time dengan bantuan AI</p>
         </div>
         
-        <Button 
-          onClick={handleAIAnalysis}
-          disabled={isAnalyzing || ponds.length === 0}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-        >
-          {isAnalyzing ? (
-            <>
-              <Brain className="h-4 w-4 mr-2 animate-pulse" />
-              Menganalisis...
-            </>
-          ) : (
-            <>
-              <Brain className="h-4 w-4 mr-2" />
-              Analisis AI
-            </>
-          )}
-        </Button>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">
+              <Clock className="h-3 w-3 mr-1" />
+              Update: {lastUpdate.toLocaleTimeString()}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={updateRealtimeData}
+              className="h-8"
+            >
+              <RefreshCw className="h-3 w-3" />
+            </Button>
+          </div>
+          
+          <Button 
+            onClick={handleAIAnalysis}
+            disabled={isAnalyzing || ponds.length === 0}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+          >
+            {isAnalyzing ? (
+              <>
+                <Brain className="h-4 w-4 mr-2 animate-pulse" />
+                Menganalisis...
+              </>
+            ) : (
+              <>
+                <Brain className="h-4 w-4 mr-2" />
+                Analisis AI
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
-      {/* Main Stats Grid */}
-      <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      {/* Main Stats Grid - Enhanced with Real-time */}
+      <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
         <StatCard
           title="Total Kolam"
           value={totalPonds}
           description={`${activePonds} aktif`}
-          icon={<Droplets className="h-5 w-5 text-blue-600" />}
+          icon={<Droplets className="h-4 w-4 text-blue-600" />}
           trend={{ value: 12, isPositive: true }}
+          className="col-span-1"
         />
         
         <StatCard
           title="Total Ikan"
           value={totalFish.toLocaleString()}
-          description={`Rata-rata umur ${avgFishAge} hari`}
-          icon={<Fish className="h-5 w-5 text-green-600" />}
+          description={`Umur ${avgFishAge} hari`}
+          icon={<Fish className="h-4 w-4 text-green-600" />}
           trend={{ value: 8, isPositive: true }}
+          className="col-span-1"
         />
         
         <StatCard
-          title="Suhu Rata-rata"
+          title="Suhu"
           value={`${avgTemperature}°C`}
-          description="Kondisi optimal"
-          icon={<Thermometer className="h-5 w-5 text-orange-600" />}
+          description="Rata-rata"
+          icon={<Thermometer className="h-4 w-4 text-orange-600" />}
           status={avgTemperature !== 'N/A' && parseFloat(avgTemperature) >= 26 && parseFloat(avgTemperature) <= 30 ? 'good' : 'warning'}
+          className="col-span-1"
         />
         
         <StatCard
-          title="pH Rata-rata"
+          title="pH Level"
           value={avgPH}
-          description="Level keasaman"
-          icon={<Activity className="h-5 w-5 text-purple-600" />}
+          description="Keasaman"
+          icon={<Activity className="h-4 w-4 text-purple-600" />}
           status={avgPH !== 'N/A' && parseFloat(avgPH) >= 6.5 && parseFloat(avgPH) <= 8.5 ? 'good' : 'warning'}
+          className="col-span-1"
+        />
+
+        <StatCard
+          title="Jadwal Pakan"
+          value={realtimeData.activeFeedingSchedules}
+          description="Pending"
+          icon={<Calendar className="h-4 w-4 text-amber-600" />}
+          status={realtimeData.activeFeedingSchedules > 5 ? 'warning' : 'good'}
+          className="col-span-1"
+        />
+
+        <StatCard
+          title="Alert Kualitas"
+          value={realtimeData.waterQualityAlerts}
+          description="Perlu perhatian"
+          icon={<AlertTriangle className="h-4 w-4 text-red-600" />}
+          status={realtimeData.waterQualityAlerts > 0 ? 'danger' : 'good'}
+          className="col-span-1"
         />
       </div>
 
@@ -307,54 +405,162 @@ export const SmartDashboardStats = () => {
         </Card>
       </div>
 
-      {/* Real-time Monitoring */}
-      <PondMonitor showAllPonds={false} />
+      {/* Real-time Monitoring & Analytics */}
+      <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <PondMonitor showAllPonds={false} />
+        </div>
+        
+        <Card className="bg-gradient-to-b from-muted/30 to-muted/10">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              Real-time Analytics
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Health Records (24h)</span>
+                <Badge variant="outline" className="text-xs">
+                  {realtimeData.recentHealthRecords}
+                </Badge>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Active Feedings</span>
+                <Badge variant={realtimeData.activeFeedingSchedules > 5 ? "destructive" : "default"} className="text-xs">
+                  {realtimeData.activeFeedingSchedules}
+                </Badge>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Water Alerts</span>
+                <Badge variant={realtimeData.waterQualityAlerts > 0 ? "destructive" : "default"} className="text-xs">
+                  {realtimeData.waterQualityAlerts}
+                </Badge>
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-foreground">System Performance</h4>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Kolam Aktif</span>
+                    <span>{Math.round((activePonds / totalPonds) * 100 || 0)}%</span>
+                  </div>
+                  <Progress value={(activePonds / totalPonds) * 100 || 0} className="h-1" />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Efisiensi Pakan</span>
+                    <span>{Math.round(((feedingSchedules.length - realtimeData.activeFeedingSchedules) / feedingSchedules.length) * 100 || 100)}%</span>
+                  </div>
+                  <Progress value={((feedingSchedules.length - realtimeData.activeFeedingSchedules) / feedingSchedules.length) * 100 || 100} className="h-1" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-primary" />
-            Aksi Cepat
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <Button 
-              variant="outline" 
-              className="h-auto p-4 flex flex-col items-center gap-2"
-              onClick={() => setShowAIAssistant(true)}
-            >
-              <Brain className="h-5 w-5" />
-              <span className="text-sm">Konsultasi AI</span>
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="h-auto p-4 flex flex-col items-center gap-2"
-            >
-              <Calendar className="h-5 w-5" />
-              <span className="text-sm">Jadwal Pakan</span>
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="h-auto p-4 flex flex-col items-center gap-2"
-            >
-              <Target className="h-5 w-5" />
-              <span className="text-sm">Prediksi Panen</span>
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="h-auto p-4 flex flex-col items-center gap-2"
-            >
-              <AlertTriangle className="h-5 w-5" />
-              <span className="text-sm">Peringatan</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Enhanced Quick Actions */}
+      <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-primary" />
+              Aksi Cepat
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+              <Button 
+                variant="outline" 
+                className="h-auto p-3 flex flex-col items-center gap-2 hover:bg-primary/5"
+                onClick={() => setShowAIAssistant(true)}
+              >
+                <Brain className="h-4 w-4" />
+                <span className="text-xs">AI Konsultasi</span>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="h-auto p-3 flex flex-col items-center gap-2 hover:bg-primary/5"
+              >
+                <Calendar className="h-4 w-4" />
+                <span className="text-xs">Jadwal Pakan</span>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="h-auto p-3 flex flex-col items-center gap-2 hover:bg-primary/5"
+              >
+                <Target className="h-4 w-4" />
+                <span className="text-xs">Prediksi</span>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="h-auto p-3 flex flex-col items-center gap-2 hover:bg-primary/5"
+              >
+                <Waves className="h-4 w-4" />
+                <span className="text-xs">Kualitas Air</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5 text-primary" />
+              Status Real-time
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-background/50">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium">Monitoring Aktif</span>
+                </div>
+                <Badge variant="outline" className="text-xs">Live</Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-2 rounded-lg bg-background/50">
+                <div className="flex items-center gap-2">
+                  <div className={cn(
+                    "h-2 w-2 rounded-full",
+                    realtimeData.waterQualityAlerts === 0 ? "bg-green-500" : "bg-red-500 animate-pulse"
+                  )}></div>
+                  <span className="text-sm font-medium">Kualitas Air</span>
+                </div>
+                <Badge variant={realtimeData.waterQualityAlerts === 0 ? "default" : "destructive"} className="text-xs">
+                  {realtimeData.waterQualityAlerts === 0 ? 'Normal' : `${realtimeData.waterQualityAlerts} Alert`}
+                </Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-2 rounded-lg bg-background/50">
+                <div className="flex items-center gap-2">
+                  <div className={cn(
+                    "h-2 w-2 rounded-full",
+                    realtimeData.activeFeedingSchedules <= 5 ? "bg-green-500" : "bg-yellow-500 animate-pulse"
+                  )}></div>
+                  <span className="text-sm font-medium">Jadwal Pakan</span>
+                </div>
+                <Badge variant={realtimeData.activeFeedingSchedules <= 5 ? "default" : "secondary"} className="text-xs">
+                  {realtimeData.activeFeedingSchedules} Pending
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* AI Assistant Modal/Sidebar */}
       {showAIAssistant && (
