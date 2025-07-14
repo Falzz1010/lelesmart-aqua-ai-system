@@ -15,30 +15,27 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, type } = await req.json();
+    const { prompt, context, conversation_history } = await req.json();
 
-    let systemPrompt = '';
-    if (type === 'health-detection') {
-      systemPrompt = `Anda adalah ahli akuakultur yang menganalisis kesehatan ikan lele. Berikan analisis berdasarkan deskripsi atau gejala yang diberikan. Format respons:
-      {
-        "healthScore": 85,
-        "status": "healthy/sick/critical",
-        "confidence": 92,
-        "diagnosis": "Diagnosis singkat",
-        "symptoms": ["gejala1", "gejala2"],
-        "treatment": "Rekomendasi pengobatan",
-        "prevention": "Tips pencegahan"
-      }`;
-    } else if (type === 'growth-prediction') {
-      systemPrompt = `Anda adalah ahli akuakultur yang memberikan prediksi pertumbuhan dan strategi panen ikan lele. Berikan analisis berdasarkan data kolam. Format respons:
-      {
-        "growthRate": "baik/sedang/lambat",
-        "harvestRecommendation": "Rekomendasi waktu panen",
-        "feedingStrategy": "Strategi pemberian pakan",
-        "expectedYield": "Prediksi hasil panen",
-        "marketTiming": "Timing pasar terbaik",
-        "profitEstimate": "Estimasi keuntungan"
-      }`;
+    let systemPrompt = 'Anda adalah AI Assistant ahli budidaya ikan lele yang memberikan konsultasi dan analisis praktis. Berikan jawaban yang informatif, praktis, dan mudah dipahami. PENTING: Jangan gunakan simbol markdown seperti *, #, **, atau simbol format lainnya dalam jawaban. Berikan respons dalam teks biasa yang rapi dan terstruktur.';
+    
+    if (context === 'pond_analysis') {
+      systemPrompt += ' Fokus pada analisis kondisi kolam dan berikan rekomendasi berdasarkan data yang diberikan.';
+    } else if (context === 'pond_recommendations') {
+      systemPrompt += ' Fokus pada rekomendasi spesifik untuk optimasi kolam dan budidaya ikan.';
+    } else if (context === 'aquaculture_assistant') {
+      systemPrompt += ' Berikan konsultasi umum seputar budidaya ikan lele.';
+    }
+
+    // Build conversation context
+    let conversationText = prompt;
+    if (conversation_history && conversation_history.length > 0) {
+      const recentHistory = conversation_history.slice(-3); // Last 3 messages
+      const historyText = recentHistory.map((msg: any) => 
+        `${msg.role === 'user' ? 'Pengguna' : 'Assistant'}: ${msg.content}`
+      ).join('\n');
+      
+      conversationText = `Konteks percakapan sebelumnya:\n${historyText}\n\nPertanyaan terbaru: ${prompt}`;
     }
 
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', {
@@ -52,26 +49,35 @@ serve(async (req) => {
           {
             parts: [
               {
-                text: `${systemPrompt}\n\nUser input: ${prompt}`
+                text: `${systemPrompt}\n\n${conversationText}`
               }
             ]
           }
-        ]
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1000,
+        }
       }),
     });
 
     const data = await response.json();
-    const generatedText = data.candidates[0].content.parts[0].text;
+    let generatedText = data.candidates[0].content.parts[0].text;
 
-    // Try to parse JSON response, fallback to text if not valid JSON
-    let aiResponse;
-    try {
-      aiResponse = JSON.parse(generatedText);
-    } catch {
-      aiResponse = { analysis: generatedText };
-    }
+    // Clean markdown symbols and formatting
+    generatedText = generatedText
+      .replace(/\*\*/g, '') // Remove bold
+      .replace(/\*/g, '') // Remove italic
+      .replace(/#{1,6}\s?/g, '') // Remove headers
+      .replace(/`/g, '') // Remove code blocks
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links, keep text
+      .replace(/^\s*[-*+]\s+/gm, '• ') // Convert list items to bullet points
+      .replace(/^\s*\d+\.\s+/gm, '') // Remove numbered list formatting
+      .trim();
 
-    return new Response(JSON.stringify({ success: true, data: aiResponse }), {
+    return new Response(JSON.stringify({ 
+      response: generatedText 
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
