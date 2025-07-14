@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Heart, AlertTriangle, CheckCircle, Upload, Camera } from "lucide-react";
+import { Heart, AlertTriangle, CheckCircle, Upload, Camera, Bot, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { usePonds } from "@/hooks/usePonds";
 import { useRealtimeData } from "@/hooks/useRealtimeData";
+import { useGeminiAI } from "@/hooks/useGeminiAI";
 
 const HealthDetection = () => {
   const [selectedPond, setSelectedPond] = useState("");
@@ -19,9 +20,13 @@ const HealthDetection = () => {
   const [symptoms, setSymptoms] = useState("");
   const [treatment, setTreatment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { ponds } = usePonds();
   const { healthRecords } = useRealtimeData();
+  const { analyzeHealth, isLoading: aiLoading } = useGeminiAI();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +55,11 @@ const HealthDetection = () => {
       setHealthStatus("");
       setSymptoms("");
       setTreatment("");
+      setSelectedImage(null);
+      setAiAnalysis(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       toast({
         variant: "destructive",
@@ -76,6 +86,93 @@ const HealthDetection = () => {
       case "sick": return <AlertTriangle className="h-4 w-4" />;
       case "critical": return <Heart className="h-4 w-4" />;
       default: return <Heart className="h-4 w-4" />;
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        setSelectedImage(file);
+        setAiAnalysis(null);
+        toast({
+          title: "Gambar Dipilih",
+          description: "Siap untuk dianalisis dengan AI"
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Format File Salah",
+          description: "Pilih file gambar (JPG, PNG, dll)"
+        });
+      }
+    }
+  };
+
+  const handleAIAnalysis = async () => {
+    if (!selectedImage) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Pilih gambar terlebih dahulu"
+      });
+      return;
+    }
+
+    try {
+      const selectedPondData = ponds?.find(p => p.id === selectedPond);
+      
+      const analysisPrompt = `
+Analisis Gambar Ikan Lele:
+
+Data Kolam (jika tersedia):
+- Nama Kolam: ${selectedPondData?.name || 'Tidak dipilih'}
+- Umur Ikan: ${selectedPondData?.fish_age_days || 'Tidak diketahui'} hari
+- Jumlah Ikan: ${selectedPondData?.fish_count || 'Tidak diketahui'} ekor
+- Ukuran Kolam: ${selectedPondData?.size_m2 || 'Tidak diketahui'} m²
+- Suhu Air: ${selectedPondData?.water_temperature || 'Tidak diketahui'}°C
+- pH: ${selectedPondData?.ph_level || 'Tidak diketahui'}
+
+Gejala yang diamati: ${symptoms || 'Tidak ada'}
+
+Berdasarkan informasi di atas dan gambar yang diberikan, berikan analisis detil mengenai:
+1. Kondisi kesehatan ikan lele yang terlihat
+2. Identifikasi potensi penyakit atau masalah kesehatan
+3. Rekomendasi tindakan pengobatan yang tepat
+4. Langkah pencegahan untuk ke depannya
+5. Estimasi tingkat keparahan (ringan/sedang/berat)
+
+Fokus pada identifikasi visual seperti:
+- Warna dan kondisi kulit/sisik
+- Postur dan gerakan ikan
+- Kondisi mata, mulut, dan insang
+- Adanya luka, bintik, atau kelainan
+- Pola berenang dan perilaku
+
+Berikan rekomendasi yang praktis dan dapat dilakukan oleh peternak.
+      `;
+
+      const result = await analyzeHealth(analysisPrompt);
+      setAiAnalysis(result);
+      
+      toast({
+        title: "Analisis Selesai",
+        description: "AI telah menganalisis gambar dan memberikan rekomendasi"
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Gagal menganalisis gambar dengan AI"
+      });
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setAiAnalysis(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -150,15 +247,58 @@ const HealthDetection = () => {
                 />
               </div>
 
-              <div className="flex space-x-2">
-                <Button variant="outline" className="flex-1">
-                  <Camera className="h-4 w-4 mr-2" />
-                  Foto Ikan
-                </Button>
-                <Button variant="outline" className="flex-1">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Gambar
-                </Button>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Upload Gambar Ikan untuk Analisis AI</Label>
+                  <div className="flex space-x-2">
+                    <Input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="flex-1"
+                    />
+                    <Button 
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Pilih Gambar
+                    </Button>
+                  </div>
+                  {selectedImage && (
+                    <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded border">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground truncate">
+                          {selectedImage.name}
+                        </span>
+                        <Button variant="ghost" size="sm" onClick={removeImage}>
+                          ×
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {selectedImage && (
+                  <Button 
+                    onClick={handleAIAnalysis}
+                    disabled={aiLoading}
+                    className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                        Menganalisis Gambar...
+                      </>
+                    ) : (
+                      <>
+                        <Bot className="h-4 w-4 mr-2" />
+                        Analisis dengan AI
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
 
               <Button 
@@ -171,6 +311,24 @@ const HealthDetection = () => {
             </form>
           </CardContent>
         </Card>
+
+        {/* AI Analysis Results */}
+        {aiAnalysis && (
+          <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-purple-100/50 dark:border-purple-700/50">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Bot className="h-5 w-5 text-purple-600" />
+                <span>Hasil Analisis AI</span>
+              </CardTitle>
+              <CardDescription>Analisis kondisi kesehatan berdasarkan gambar</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200/50 dark:border-purple-700/50">
+                <div className="whitespace-pre-wrap text-sm">{aiAnalysis}</div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Recent Health Records */}
         <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-blue-100/50 dark:border-gray-700/50">

@@ -14,7 +14,7 @@ export const useGeminiAI = () => {
       const { data, error: functionError } = await supabase.functions.invoke('gemini-ai', {
         body: {
           prompt,
-          type: 'health-detection'
+          context: 'aquaculture_assistant'
         }
       });
 
@@ -22,11 +22,7 @@ export const useGeminiAI = () => {
         throw new Error(functionError.message);
       }
 
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to analyze health');
-      }
-
-      return data.data;
+      return data.response;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
@@ -44,7 +40,7 @@ export const useGeminiAI = () => {
       const { data, error: functionError } = await supabase.functions.invoke('gemini-ai', {
         body: {
           prompt,
-          type: 'growth-prediction'
+          context: 'pond_recommendations'
         }
       });
 
@@ -52,11 +48,7 @@ export const useGeminiAI = () => {
         throw new Error(functionError.message);
       }
 
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to predict growth');
-      }
-
-      return data.data;
+      return data.response;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);

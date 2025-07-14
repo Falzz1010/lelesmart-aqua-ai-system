@@ -198,12 +198,21 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
 
     try {
       const result = await predictGrowth(fullPrompt);
-      setAiPrediction(result);
+      
+      // Parse AI response yang sudah bersih dari markdown
+      const parsedResult = {
+        analysis: result,
+        // Jika ingin extract bagian tertentu bisa ditambahkan di sini
+        // Sementara tampilkan seluruh response sebagai analisis umum
+      };
+      
+      setAiPrediction(parsedResult);
       toast({
         title: "Prediksi Selesai",
         description: "AI telah menganalisis data real-time dan memberikan prediksi"
       });
     } catch (error) {
+      console.error('AI Prediction Error:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -316,48 +325,10 @@ Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan re
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {aiPrediction.growthRate && (
-                <div className="p-4 bg-blue-50/50 rounded-lg">
-                  <h4 className="font-semibold text-blue-800 mb-2">📈 Tingkat Pertumbuhan:</h4>
-                  <p className="text-blue-700 capitalize font-medium">{aiPrediction.growthRate}</p>
-                </div>
-              )}
-              
-              {aiPrediction.harvestRecommendation && (
-                <div className="p-4 bg-green-50/50 rounded-lg">
-                  <h4 className="font-semibold text-green-800 mb-2">🎯 Rekomendasi Panen:</h4>
-                  <p className="text-green-700">{aiPrediction.harvestRecommendation}</p>
-                </div>
-              )}
-
-              {aiPrediction.feedingStrategy && (
-                <div className="p-4 bg-orange-50/50 rounded-lg">
-                  <h4 className="font-semibold text-orange-800 mb-2">🍽️ Strategi Pakan:</h4>
-                  <p className="text-orange-700">{aiPrediction.feedingStrategy}</p>
-                </div>
-              )}
-
-              {aiPrediction.expectedYield && (
-                <div className="p-4 bg-purple-50/50 rounded-lg">
-                  <h4 className="font-semibold text-purple-800 mb-2">⚖️ Prediksi Hasil:</h4>
-                  <p className="text-purple-700">{aiPrediction.expectedYield}</p>
-                </div>
-              )}
-
-              {aiPrediction.marketTiming && (
-                <div className="p-4 bg-teal-50/50 rounded-lg">
-                  <h4 className="font-semibold text-teal-800 mb-2">📊 Timing Pasar:</h4>
-                  <p className="text-teal-700">{aiPrediction.marketTiming}</p>
-                </div>
-              )}
-
-              {aiPrediction.profitEstimate && (
-                <div className="p-4 bg-yellow-50/50 rounded-lg">
-                  <h4 className="font-semibold text-yellow-800 mb-2">💰 Estimasi Profit:</h4>
-                  <p className="text-yellow-700">{aiPrediction.profitEstimate}</p>
-                </div>
-              )}
+            <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200/50 dark:border-purple-700/50">
+              <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                {aiPrediction.analysis}
+              </div>
             </div>
           </CardContent>
         </Card>
