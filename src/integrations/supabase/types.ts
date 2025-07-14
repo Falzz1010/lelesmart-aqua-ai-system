@@ -426,6 +426,10 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: string
       }
+      is_admin_user: {
+        Args: { user_id?: string }
+        Returns: boolean
+      }
     }
     Enums: {
       submission_type: "proposal" | "chapter" | "final" | "revision"

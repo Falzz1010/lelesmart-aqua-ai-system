@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,35 +7,35 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Navigate } from 'react-router-dom';
-import { Fish, AlertCircle } from 'lucide-react';
+import { Shield, AlertCircle } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
-export const Auth = () => {
+export const AdminAuth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const { signIn, signUp, loading, user } = useAuth();
   const { profile } = useProfile(user);
   const [error, setError] = useState('');
 
-  // Redirect if already logged in
-  if (user && profile) {
-    if (profile.role === 'admin') {
-      return <Navigate to="/admin" replace />;
-    } else {
-      return <Navigate to="/" replace />;
-    }
+  // Redirect if already logged in as admin
+  if (user && profile?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  // Redirect if logged in as non-admin
+  if (user && profile?.role !== 'admin') {
+    return <Navigate to="/" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    // Prevent admin emails from using user login
+    // Validate admin email
     const isAdminEmail = email === 'admin@gmail.com' || email === 'admin@lelesmart.com';
-    if (isAdminEmail) {
-      setError('Akun admin harus masuk melalui halaman admin. Klik link "Masuk sebagai Admin" di bawah.');
+    if (!isAdminEmail) {
+      setError('Email ini bukan akun admin yang valid. Gunakan admin@gmail.com atau admin@lelesmart.com');
       return;
     }
 
@@ -47,7 +46,7 @@ export const Auth = () => {
 
     try {
       if (isSignUp) {
-        const result = await signUp(email, password, fullName || 'User');
+        const result = await signUp(email, password, 'Administrator');
         if (result.error) {
           setError(result.error.message);
         }
@@ -73,49 +72,34 @@ export const Auth = () => {
           <div className="text-center space-y-2">
             <div className="flex justify-center">
               <div className="p-3 bg-primary/10 rounded-full">
-                <Fish className="h-8 w-8 text-primary" />
+                <Shield className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-foreground">LeleSmart</h1>
+            <h1 className="text-3xl font-bold text-foreground">Admin Portal</h1>
             <p className="text-muted-foreground">
-              Sistem Manajemen Kolam Ikan Cerdas
+              Masuk ke dashboard administrator LeleSmart
             </p>
           </div>
 
           <Card>
             <CardHeader>
               <CardTitle className="text-center">
-                {isSignUp ? 'Daftar Petani' : 'Masuk Petani'}
+                {isSignUp ? 'Daftar Admin' : 'Masuk Admin'}
               </CardTitle>
               <CardDescription className="text-center">
-                {isSignUp ? 'Buat akun petani baru' : 'Masuk dengan akun petani'}
+                {isSignUp ? 'Buat akun administrator baru' : 'Masuk dengan akun administrator'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
-                {isSignUp && (
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Nama Lengkap</Label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Masukkan nama lengkap"
-                      required
-                      className="w-full"
-                    />
-                  </div>
-                )}
-
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email Admin</Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Masukkan email Anda"
+                    placeholder="admin@gmail.com atau admin@lelesmart.com"
                     required
                     className="w-full"
                   />
@@ -166,22 +150,19 @@ export const Auth = () => {
             </CardContent>
           </Card>
 
-          <div className="text-center space-y-2">
-            <a href="/admin-auth" className="block text-primary hover:underline font-medium">
-              Masuk sebagai Admin →
+          <div className="text-center">
+            <a href="/" className="text-sm text-primary hover:underline">
+              ← Kembali ke halaman utama
             </a>
-            <p className="text-xs text-muted-foreground">
-              Khusus untuk administrator sistem
-            </p>
           </div>
 
-          <div className="text-center text-sm text-muted-foreground">
-            <p>Untuk akun petani, gunakan email dan password pribadi Anda</p>
+          <div className="text-center text-sm text-muted-foreground space-y-1">
+            <p><strong>Akun Admin Default:</strong></p>
+            <p>Email: admin@gmail.com atau admin@lelesmart.com</p>
+            <p>Password: admin123</p>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-export default Auth;
