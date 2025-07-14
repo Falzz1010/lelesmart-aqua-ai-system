@@ -64,7 +64,7 @@ serve(async (req) => {
     const data = await response.json();
     let generatedText = data.candidates[0].content.parts[0].text;
 
-    // Aggressive markdown cleaning
+    // Complete markdown cleaning - remove ALL formatting symbols
     generatedText = generatedText
       .replace(/\*\*\*([^*]+)\*\*\*/g, '$1') // Remove triple asterisks
       .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold 
@@ -77,6 +77,7 @@ serve(async (req) => {
       .replace(/^\s*\d+\.\s+/gm, '') // Remove numbered lists
       .replace(/[-_]{2,}/g, '') // Remove horizontal lines
       .replace(/[*_#`~\[\]()]/g, '') // Remove remaining markdown symbols
+      .replace(/\n\s*\n/g, '\n\n') // Clean up excessive line breaks
       .replace(/\s+/g, ' ') // Normalize whitespace
       .trim();
 

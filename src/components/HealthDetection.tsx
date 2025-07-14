@@ -122,48 +122,66 @@ const HealthDetection = () => {
     try {
       const selectedPondData = ponds?.find(p => p.id === selectedPond);
       
-      const analysisPrompt = `
-Analisis Gambar Ikan Lele:
+      // Convert image to base64
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Data = e.target?.result as string;
+        
+        const analysisPrompt = `
+Kamu adalah ahli veteriner ikan lele berpengalaman. Analisis gambar ikan lele ini berdasarkan data berikut:
 
-Data Kolam (jika tersedia):
-- Nama Kolam: ${selectedPondData?.name || 'Tidak dipilih'}
-- Umur Ikan: ${selectedPondData?.fish_age_days || 'Tidak diketahui'} hari
-- Jumlah Ikan: ${selectedPondData?.fish_count || 'Tidak diketahui'} ekor
-- Ukuran Kolam: ${selectedPondData?.size_m2 || 'Tidak diketahui'} m²
-- Suhu Air: ${selectedPondData?.water_temperature || 'Tidak diketahui'}°C
-- pH: ${selectedPondData?.ph_level || 'Tidak diketahui'}
+DATA KOLAM:
+- Kolam: ${selectedPondData?.name || 'Tidak dipilih'}
+- Umur ikan: ${selectedPondData?.fish_age_days || 'Tidak diketahui'} hari
+- Jumlah ikan: ${selectedPondData?.fish_count || 'Tidak diketahui'} ekor
+- Ukuran kolam: ${selectedPondData?.size_m2 || 'Tidak diketahui'} meter persegi
+- Suhu air: ${selectedPondData?.water_temperature || 'Tidak diketahui'} derajat Celsius
+- pH air: ${selectedPondData?.ph_level || 'Tidak diketahui'}
 
-Gejala yang diamati: ${symptoms || 'Tidak ada'}
+GEJALA YANG DIAMATI:
+${symptoms || 'Tidak ada gejala khusus yang dilaporkan'}
 
-Berdasarkan informasi di atas dan gambar yang diberikan, berikan analisis detil mengenai:
-1. Kondisi kesehatan ikan lele yang terlihat
-2. Identifikasi potensi penyakit atau masalah kesehatan
-3. Rekomendasi tindakan pengobatan yang tepat
-4. Langkah pencegahan untuk ke depannya
-5. Estimasi tingkat keparahan (ringan/sedang/berat)
+GAMBAR: ${base64Data}
 
-Fokus pada identifikasi visual seperti:
-- Warna dan kondisi kulit/sisik
-- Postur dan gerakan ikan
-- Kondisi mata, mulut, dan insang
-- Adanya luka, bintik, atau kelainan
-- Pola berenang dan perilaku
+Berikan analisis lengkap dalam format berikut:
 
-Berikan rekomendasi yang praktis dan dapat dilakukan oleh peternak.
-      `;
+KONDISI KESEHATAN UMUM:
+[Deskripsi kondisi ikan berdasarkan visual]
 
-      const result = await analyzeHealth(analysisPrompt);
-      setAiAnalysis(result);
+IDENTIFIKASI MASALAH:
+[Penyakit atau masalah yang terdeteksi]
+
+TINGKAT KEPARAHAN:
+[Ringan/Sedang/Berat dengan penjelasan]
+
+REKOMENDASI PENGOBATAN:
+[Langkah pengobatan yang spesifik]
+
+PENCEGAHAN:
+[Tindakan pencegahan ke depan]
+
+PROGNOSIS:
+[Perkiraan kesembuhan dan timeline]
+
+Jawab dengan praktis dan dapat diterapkan peternak.
+        `;
+
+        const result = await analyzeHealth(analysisPrompt);
+        setAiAnalysis(result);
+        
+        toast({
+          title: "Analisis Selesai",
+          description: "AI telah menganalisis gambar dan memberikan rekomendasi kesehatan"
+        });
+      };
       
-      toast({
-        title: "Analisis Selesai",
-        description: "AI telah menganalisis gambar dan memberikan rekomendasi"
-      });
+      reader.readAsDataURL(selectedImage);
     } catch (error) {
+      console.error('AI Analysis Error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Gagal menganalisis gambar dengan AI"
+        description: "Gagal menganalisis gambar dengan AI. Pastikan koneksi internet stabil."
       });
     }
   };

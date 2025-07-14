@@ -181,19 +181,38 @@ const GrowthPredictions = () => {
     });
 
     const fullPrompt = `
-Data Kolam Real-time:
+Kamu adalah konsultan budidaya ikan lele profesional dengan 20 tahun pengalaman. Analisis data kolam real-time berikut:
+
+DATA KOLAM AKTUAL:
 ${JSON.stringify(contextData, null, 2)}
 
-Informasi Tambahan:
-${growthPrompt || 'Berikan analisis umum berdasarkan data kolam yang ada'}
+KONTEKS TAMBAHAN:
+${growthPrompt || 'Berikan analisis menyeluruh berdasarkan data yang tersedia'}
 
-Berdasarkan data real-time di atas, berikan analisis prediksi pertumbuhan dan rekomendasi panen yang spesifik. Sertakan:
-1. Tingkat pertumbuhan berdasarkan umur dan pakan
-2. Rekomendasi waktu panen optimal
-3. Strategi pakan yang disesuaikan
-4. Prediksi hasil panen
-5. Timing pasar yang tepat
-6. Estimasi keuntungan berdasarkan kondisi saat ini
+Berikan analisis prediksi pertumbuhan dan strategi panen dalam format terstruktur:
+
+ANALISIS PERTUMBUHAN SAAT INI:
+[Evaluasi pertumbuhan berdasarkan umur, pakan, dan kondisi kolam]
+
+PREDIKSI HASIL PANEN:
+[Estimasi berat, jumlah, dan waktu panen optimal per kolam]
+
+REKOMENDASI STRATEGI PAKAN:
+[Penyesuaian jadwal dan jenis pakan berdasarkan fase pertumbuhan]
+
+ANALISIS KUALITAS AIR:
+[Evaluasi parameter air dan dampaknya terhadap pertumbuhan]
+
+PROYEKSI KEUNTUNGAN:
+[Estimasi pendapatan dengan perhitungan biaya operasional]
+
+TIMELINE PANEN OPTIMAL:
+[Jadwal panen yang mengoptimalkan harga pasar]
+
+REKOMENDASI KHUSUS:
+[Saran spesifik untuk meningkatkan produktivitas]
+
+Berikan angka konkret dan jadwal yang dapat diterapkan langsung.
     `;
 
     try {
