@@ -141,12 +141,12 @@ All colors MUST be HSL.
   .dark .bg-white\/70 { @apply bg-gray-800/70; }
   .dark .bg-white\/50 { @apply bg-gray-800/50; }
 
-  .dark .bg-blue-50\/50   { @apply bg-blue-900/20; }
-  .dark .bg-green-50\/50  { @apply bg-green-900/20; }
-  .dark .bg-orange-50\/50 { @apply bg-orange-900/20; }
-  .dark .bg-purple-50\/50 { @apply bg-purple-900/20; }
-  .dark .bg-red-50\/50    { @apply bg-red-900/20; }
-  .dark .bg-yellow-50\/50 { @apply bg-yellow-900/20; }
+  .dark .bg-blue-50\/50   { @apply bg-blue-800/60; }
+  .dark .bg-green-50\/50  { @apply bg-green-800/60; }
+  .dark .bg-orange-50\/50 { @apply bg-orange-800/60; }
+  .dark .bg-purple-50\/50 { @apply bg-purple-800/60; }
+  .dark .bg-red-50\/50    { @apply bg-red-800/60; }
+  .dark .bg-yellow-50\/50 { @apply bg-yellow-700/60; }
 
   .dark .bg-green-100  { @apply bg-green-900/20; }
   .dark .bg-yellow-100 { @apply bg-yellow-900/20; }
