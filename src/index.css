@@ -135,4 +135,26 @@ All colors MUST be HSL.
   .dark .text-gray-700 { @apply text-gray-300; }
   .dark .text-gray-800 { @apply text-gray-200; }
   .dark .text-black { @apply text-white; }
+
+  /* Background overrides for dark mode */
+  .dark .bg-white\/95 { @apply bg-gray-900/95; }
+  .dark .bg-white\/70 { @apply bg-gray-800/70; }
+  .dark .bg-white\/50 { @apply bg-gray-800/50; }
+
+  .dark .bg-blue-50\/50   { @apply bg-blue-900/20; }
+  .dark .bg-green-50\/50  { @apply bg-green-900/20; }
+  .dark .bg-orange-50\/50 { @apply bg-orange-900/20; }
+  .dark .bg-purple-50\/50 { @apply bg-purple-900/20; }
+  .dark .bg-red-50\/50    { @apply bg-red-900/20; }
+  .dark .bg-yellow-50\/50 { @apply bg-yellow-900/20; }
+
+  /* Border overrides for dark mode */
+  .dark .border-blue-100\/50   { @apply border-blue-800/50; }
+  .dark .border-purple-100\/50 { @apply border-purple-800/50; }
+  .dark .border-green-100\/50  { @apply border-green-800/50; }
+  .dark .border-orange-100\/50 { @apply border-orange-800/50; }
+  .dark .border-red-100\/50    { @apply border-red-800/50; }
+  .dark .border-yellow-100\/50 { @apply border-yellow-800/50; }
+
+  .dark .border-blue-100\/30   { @apply border-blue-800/30; }
 }
