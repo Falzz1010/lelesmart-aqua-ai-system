@@ -59,17 +59,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const ensureAdminUser = async () => {
     try {
       // Check if admin user exists
-      const { data: existingAdmin, error: checkError } = await supabase
+      const { data: existingAdminArray, error: checkError } = await supabase
         .from('profiles')
         .select('*')
         .eq('email', 'admin@gmail.com')
-        .single();
+        .limit(1);
 
-      if (checkError && checkError.code !== 'PGRST116') {
+      if (checkError) {
         console.error('Error checking admin user:', checkError);
         return;
       }
 
+      const existingAdmin = existingAdminArray && existingAdminArray.length > 0 ? existingAdminArray[0] : null;
+      
       if (!existingAdmin) {
         console.log('Admin user not found, creating...');
         
