@@ -66,8 +66,8 @@ const Index = () => {
   const isAdmin = profile?.role === 'admin';
   const SidebarComponent = isAdmin ? AdminSidebar : AppSidebar;
   const bgGradient = isAdmin 
-    ? "bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20"
-    : "bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 dark:from-blue-900/20 dark:via-cyan-900/20 dark:to-teal-900/20";
+    ? "bg-gradient-to-br from-red-100/60 via-orange-100/60 to-yellow-100/60 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20"
+    : "bg-gradient-to-br from-blue-100/60 via-cyan-100/60 to-teal-100/60 dark:from-blue-900/20 dark:via-cyan-900/20 dark:to-teal-900/20";
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -76,11 +76,11 @@ const Index = () => {
         
         <SidebarInset className="flex-1 flex flex-col min-w-0">
           {/* Mobile Header */}
-          <header className={`sticky top-0 z-40 border-b ${isAdmin ? 'border-red-100/50 bg-red-50/95 dark:border-red-800/50 dark:bg-red-900/95' : 'border-blue-100/50 bg-white/95 dark:border-blue-800/50 dark:bg-card/95'} backdrop-blur-md lg:hidden`}>
+          <header className={`sticky top-0 z-40 border-b ${isAdmin ? 'border-red-200 bg-red-50/98 dark:border-red-800/50 dark:bg-red-900/95' : 'border-blue-200 bg-white/98 dark:border-blue-800/50 dark:bg-card/95'} backdrop-blur-md lg:hidden shadow-sm`}>
             <div className="flex h-12 sm:h-14 items-center justify-between px-3 sm:px-4">
               <div className="flex items-center min-w-0">
                 <SidebarTrigger className="mr-2 flex-shrink-0" />
-                <h1 className="font-semibold text-sm sm:text-base truncate text-foreground">
+                <h1 className="font-semibold text-sm sm:text-base truncate text-gray-900 dark:text-foreground">
                   {isAdmin ? 'LeleSmart Admin' : 'LeleSmart'}
                 </h1>
               </div>

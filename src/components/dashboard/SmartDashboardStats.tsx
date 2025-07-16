@@ -59,17 +59,17 @@ const StatCard = ({
   return (
     <Card className={cn(
       "relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
-      statusStyles[status],
+      statusStyles[status] + " shadow-sm",
       className
     )}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-background/60 backdrop-blur-sm rounded-full border border-border/50">
+            <div className="p-2 bg-white/90 dark:bg-background/60 backdrop-blur-sm rounded-full border border-gray-200 dark:border-border/50 shadow-sm">
               {icon}
             </div>
             <div>
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-sm font-medium text-gray-600 dark:text-muted-foreground">
                 {title}
               </CardTitle>
             </div>
